@@ -1,1 +1,0 @@
-// Placeholder for Books page

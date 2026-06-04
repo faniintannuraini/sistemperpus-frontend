@@ -1,0 +1,1 @@
+// Placeholder for StudentLayout component
