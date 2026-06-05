@@ -1,19 +1,34 @@
-import React, { useState } from 'react';
-import { Outlet, NavLink, useLocation } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Outlet, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import '../styles/student-layout.css';
 
 export default function StudentLayout() {
-  const [sidebarOpen, setSidebarOpen] = useState(false); // Default closed for mobile
+  const [sidebarOpen, setSidebarOpen] = useState(window.innerWidth > 768); // Default open on desktop
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const location = useLocation();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const handleResize = () => {
+      const mobile = window.innerWidth <= 768;
+      setIsMobile(mobile);
+      if (!mobile) {
+        setSidebarOpen(true);
+      } else {
+        setSidebarOpen(false);
+      }
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const handleLogout = () => {
-    console.log('Logging out...');
-    // Real logout logic should be added here
+    navigate('/login');
   };
 
   const handleMenuClick = () => {
-    if (window.innerWidth <= 768) {
-      setSidebarOpen(false); // Close sidebar on menu click in mobile
+    if (isMobile) {
+      setSidebarOpen(false); // Close sidebar on mobile item click
     }
   };
 
@@ -25,8 +40,8 @@ export default function StudentLayout() {
 
   return (
     <div className="student-layout-container">
-      {/* Backdrop overlay for mobile */}
-      {sidebarOpen && (
+      {/* Backdrop overlay for mobile drawer only */}
+      {isMobile && sidebarOpen && (
         <div className="sidebar-backdrop" onClick={() => setSidebarOpen(false)}></div>
       )}
 
