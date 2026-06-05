@@ -1,14 +1,26 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import '../../styles/login.css';
 
 export default function Login() {
+  const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState('');
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    setError('');
     console.log('Login attempt:', { email, password });
+
+    if (email.includes('admin')) {
+      navigate('/admin/dashboard');
+    } else if (email.includes('student')) {
+      navigate('/student/dashboard');
+    } else {
+      setError('Email atau password tidak sesuai.');
+    }
   };
 
   const togglePasswordVisibility = () => {
@@ -50,6 +62,23 @@ export default function Login() {
 
           <h2>Login</h2>
           <div className="login-card-subtitle">Silahkan Masuk Ke Akun Anda</div>
+
+          {error && (
+            <div className="login-error-message" style={{ 
+              color: '#ef4444', 
+              backgroundColor: '#fee2e2', 
+              border: '1px solid #fca5a5', 
+              padding: '10px', 
+              borderRadius: '6px', 
+              marginBottom: '15px', 
+              fontSize: '14px',
+              textAlign: 'center',
+              width: '100%',
+              boxSizing: 'border-box'
+            }}>
+              {error}
+            </div>
+          )}
 
           <form onSubmit={handleSubmit} className="login-form">
             {/* Email Input */}
