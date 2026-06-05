@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Login from "../pages/auth/Login";
 import AdminDashboard from "../pages/admin/Dashboard";
 import StudentDashboard from "../pages/student/Dashboard";
+import StudentLayout from "../layouts/StudentLayout";
 
 export default function AppRoutes() {
   return (
@@ -17,8 +18,11 @@ export default function AppRoutes() {
         {/* Admin Route */}
         <Route path="/admin/dashboard" element={<AdminDashboard />} />
         
-        {/* Student Route */}
-        <Route path="/student/dashboard" element={<StudentDashboard />} />
+        {/* Student Routes */}
+        <Route path="/student" element={<StudentLayout />}>
+          <Route index element={<Navigate to="/student/dashboard" replace />} />
+          <Route path="dashboard" element={<StudentDashboard />} />
+        </Route>
         
         {/* Fallback route - redirect any undefined path to login */}
         <Route path="*" element={<Navigate to="/login" replace />} />

@@ -116,10 +116,9 @@ export default function StudentLayout() {
           <div className="student-navbar-right">
             <div className="user-profile-info">
               <div className="user-details">
-                <span className="user-name">Mahasiswa</span>
-                <span className="user-role">Mahasiswa</span>
+                <span className="user-name">Nama Mahasiswa</span>
               </div>
-              <div className="user-avatar">M</div>
+              <div className="user-avatar">NM</div>
             </div>
           </div>
         </nav>
