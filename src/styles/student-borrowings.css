@@ -1,0 +1,475 @@
+/* Refined Student Borrowings Page Styles */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+.borrowings-page-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  max-width: 1200px;
+  margin: 0 auto;
+  box-sizing: border-box;
+  font-family: 'Inter', var(--sans); /* Applied Inter font */
+}
+
+/* Page Header */
+.borrowings-header {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.borrowings-header h1 {
+  font-size: 32px; /* 32px size */
+  font-weight: 700; /* Cleaner weight (instead of 800) */
+  margin: 0;
+  color: var(--text-h);
+  letter-spacing: -0.5px;
+}
+
+.borrowings-header p {
+  font-size: 15px;
+  color: var(--text);
+  margin: 0;
+  opacity: 0.8;
+  font-weight: 400;
+}
+
+/* --- PREMIUM STAT CARDS --- */
+.borrowings-stats-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+@media (max-width: 768px) {
+  .borrowings-stats-row {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+}
+
+.stat-card {
+  background-color: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 14px; /* 14px border radius */
+  padding: 18px; /* 18px padding */
+  height: 96px; /* 90-100px height */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.01);
+  box-sizing: border-box;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.stat-card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.02);
+}
+
+.stat-card-title {
+  font-size: 12px; /* 12px font */
+  font-weight: 500; /* 500 font-weight */
+  color: var(--text); /* gray color */
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  opacity: 0.8;
+}
+
+.stat-card-number {
+  font-size: 32px; /* 32px font */
+  font-weight: 700; /* 700 weight */
+  color: var(--text-h);
+  line-height: 1;
+}
+
+.stat-card.blue-accent {
+  border-left: 3px solid var(--student-primary); /* Thinner 3px border */
+}
+.stat-card.blue-accent .stat-card-number {
+  color: var(--student-primary);
+}
+
+.stat-card.yellow-accent {
+  border-left: 3px solid #d97706; /* Thinner 3px border */
+}
+.stat-card.yellow-accent .stat-card-number {
+  color: #d97706;
+}
+
+.stat-card.red-accent {
+  border-left: 3px solid #ef4444; /* Thinner 3px border */
+}
+.stat-card.red-accent .stat-card-number {
+  color: #ef4444;
+}
+
+/* --- UNIFIED SEARCH & FILTER TOOLBAR --- */
+.borrowings-controls-row {
+  display: flex;
+  gap: 16px;
+  width: 100%;
+}
+
+.borrowings-search-field {
+  flex: 85;
+  position: relative;
+  height: 44px;
+}
+
+.borrowings-search-field input {
+  width: 100%;
+  height: 100%;
+  padding: 0 16px 0 44px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background-color: var(--bg);
+  color: var(--text-h);
+  font-size: 14px;
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.01);
+}
+
+.borrowings-search-field input:focus {
+  border-color: var(--student-primary);
+  box-shadow: 0 0 0 3px var(--student-primary-bg);
+}
+
+.borrowings-search-field svg {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text);
+  width: 18px;
+  height: 18px;
+}
+
+.borrowings-filter-btn {
+  flex: 15;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border-radius: 8px;
+  border: 1px solid var(--student-primary-border);
+  background-color: transparent;
+  color: var(--student-primary);
+  font-size: 13.5px;
+  font-weight: 500; /* Clean weight */
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.borrowings-filter-btn:hover {
+  background-color: var(--student-primary-bg);
+  border-color: var(--student-primary);
+}
+
+/* --- MAIN WHITE LIST CONTAINER CARD --- */
+.borrowings-main-container-card {
+  background-color: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 28px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.02);
+  box-sizing: border-box;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  margin-top: 24px;
+}
+
+.borrowings-container-header {
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 16px;
+}
+
+.borrowings-container-title {
+  font-size: 18px;
+  font-weight: 600; /* Less heavy weight */
+  color: var(--text-h);
+  margin: 0;
+  letter-spacing: -0.3px;
+}
+
+/* --- ITEM CARDS LIST --- */
+.borrowings-list-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Compact individual item card */
+.borrowing-card {
+  background-color: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 16px 24px;
+  display: grid;
+  grid-template-columns: 100px 1fr auto auto;
+  gap: 24px;
+  align-items: center;
+  height: 140px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.01);
+  box-sizing: border-box;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.borrowing-card:hover {
+  border-color: var(--student-primary-border);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03);
+}
+
+/* Cover Image container */
+.small-cover {
+  width: 80px;
+  height: 110px;
+  background-color: var(--code-bg);
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  flex-shrink: 0;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.04);
+}
+
+/* Info details column */
+.borrowing-title-details {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.borrowing-title {
+  font-size: 18px; /* Cleaned up sizes */
+  font-weight: 600; /* Inter semibold */
+  color: var(--text-h);
+  margin: 0;
+  line-height: 1.35;
+  letter-spacing: -0.3px;
+}
+
+.borrowing-author {
+  font-size: 14px; /* Cleaned up sizes */
+  color: var(--text);
+  margin: 0;
+  font-weight: 400; /* Regular weight */
+}
+
+.borrowing-dates-row {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-top: 4px;
+}
+
+.borrowing-date-item {
+  font-size: 12px;
+  color: #88888b;
+  font-weight: 400;
+}
+
+.borrowing-date-item strong {
+  color: var(--text-h);
+  font-weight: 500; /* Normal bold for Inter */
+}
+
+/* Status section */
+.borrowing-status-col {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Status Pill Badges */
+.status-badge {
+  padding: 6px 16px;
+  border-radius: 30px;
+  font-size: 12px;
+  font-weight: 600; /* Semibold Inter */
+  white-space: nowrap;
+  text-align: center;
+  display: inline-block;
+  line-height: 1.2;
+}
+
+.status-badge.dipinjam {
+  background-color: rgba(16, 185, 129, 0.1);
+  color: #10b981;
+  border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.status-badge.jatuh-tempo-besok {
+  background-color: rgba(245, 158, 11, 0.1);
+  color: #d97706;
+  border: 1px solid rgba(245, 158, 11, 0.2);
+}
+
+.status-badge.terlambat {
+  background-color: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+/* Action buttons section */
+.borrowing-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.action-btn-primary {
+  padding: 8px 16px;
+  height: 38px;
+  border-radius: 8px;
+  background-color: var(--student-primary);
+  border: 1px solid var(--student-primary);
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 500; /* Cleaner weight */
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.action-btn-primary:hover {
+  background-color: var(--student-primary-hover);
+  border-color: var(--student-primary-hover);
+}
+
+.action-btn-outline {
+  padding: 8px 16px;
+  height: 38px;
+  border-radius: 8px;
+  background-color: transparent;
+  border: 1px solid var(--student-primary-border);
+  color: var(--student-primary);
+  font-size: 13px;
+  font-weight: 500; /* Cleaner weight */
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.action-btn-outline:hover:not(:disabled) {
+  background-color: var(--student-primary-bg);
+  border-color: var(--student-primary);
+}
+
+.action-btn-outline:disabled {
+  border-color: var(--border);
+  color: var(--text);
+  cursor: not-allowed;
+}
+
+/* Modal renewal confirmation alert */
+.renew-success-alert {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: rgba(16, 185, 129, 0.08);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  color: #10b981;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.renew-success-alert svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* --- RESPONSIVE ADJUSTMENTS --- */
+
+/* Tablet View */
+@media (max-width: 1024px) {
+  .borrowing-card {
+    grid-template-columns: 100px 1fr auto;
+    height: auto;
+    padding: 20px;
+  }
+  
+  .borrowing-card-right {
+    grid-column: span 3;
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    margin-top: 12px;
+    border-top: 1px solid var(--border);
+    padding-top: 12px;
+  }
+
+  .borrowing-status-col {
+    justify-content: flex-start;
+  }
+  
+  .borrowing-actions {
+    grid-column: span 3;
+    justify-content: flex-end;
+    margin-top: 8px;
+  }
+}
+
+/* Mobile View - Stacked Vertically */
+@media (max-width: 768px) {
+  .borrowing-card {
+    grid-template-columns: 1fr;
+    height: auto;
+    padding: 16px;
+    gap: 16px;
+    text-align: center;
+  }
+
+  .small-cover {
+    margin: 0 auto;
+  }
+
+  .borrowing-title-details {
+    align-items: center;
+  }
+
+  .borrowing-dates-row {
+    justify-content: center;
+  }
+
+  .borrowing-status-col {
+    justify-content: center;
+  }
+
+  .borrowing-actions {
+    justify-content: center;
+    width: 100%;
+  }
+
+  .action-btn-primary, .action-btn-outline {
+    flex: 1;
+  }
+
+  .borrowings-controls-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .borrowings-search-field {
+    flex: none;
+    width: 100%;
+  }
+
+  .borrowings-filter-btn {
+    flex: none;
+    width: 100%;
+  }
+}
