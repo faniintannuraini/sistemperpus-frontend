@@ -1,276 +1,403 @@
-/* Student Dashboard Styles */
+.student-dashboard-wrapper {
+  display: flex;
+  gap: 32px;
+  max-width: 1200px;
+  margin: 0 auto;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  box-sizing: border-box;
+}
 
-.dashboard-wrapper {
+/* Columns */
+.dashboard-main-column {
+  flex: 3;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  min-width: 0; /* Prevents overflow */
+}
+
+.dashboard-sidebar-column {
+  flex: 1;
   display: flex;
   flex-direction: column;
   gap: 24px;
-  max-width: 1200px;
-  margin: 0 auto;
+  min-width: 280px;
+  max-width: 320px;
+  position: sticky;
+  top: 0;
+  align-self: flex-start;
+  height: fit-content;
 }
 
-/* Hero Banner */
-.dashboard-hero {
-  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+/* Welcome Hero Banner */
+.welcome-hero-banner {
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
   color: #ffffff;
-  padding: 32px;
+  padding: 40px;
   border-radius: 16px;
-  box-shadow: 0 4px 20px rgba(37, 99, 235, 0.15);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.3);
   position: relative;
   overflow: hidden;
 }
 
-.dashboard-hero::before {
+.welcome-hero-banner::after {
   content: '';
   position: absolute;
-  top: -50px;
-  right: -50px;
+  top: -20%;
+  right: -10%;
   width: 200px;
   height: 200px;
+  background: rgba(255, 255, 255, 0.08);
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.1);
+  pointer-events: none;
 }
 
-.hero-content h1 {
-  font-size: 28px;
+.hero-banner-info {
+  position: relative;
+  z-index: 2;
+  max-width: 80%;
+}
+
+.hero-banner-title {
+  font-size: 26px;
   font-weight: 700;
-  margin: 0 0 8px 0;
-  color: #ffffff;
+  margin: 0 0 10px 0;
   letter-spacing: -0.5px;
-}
-
-.hero-content p {
-  font-size: 16px;
-  opacity: 0.9;
-  margin: 0;
-}
-
-/* Two Column Layout */
-.dashboard-grid {
-  display: grid;
-  grid-template-columns: 2fr 1fr;
-  gap: 24px;
-}
-
-@media (max-width: 1024px) {
-  .dashboard-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
-/* Section Common Styles */
-.dashboard-section {
-  background-color: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 24px;
-  box-shadow: var(--shadow);
-}
-
-.section-title {
-  font-size: 18px;
-  font-weight: 600;
-  color: var(--text-h);
-  margin: 0 0 20px 0;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-/* Book Grid */
-.book-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  gap: 20px;
-}
-
-.book-card {
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  background-color: var(--bg);
-  transition: transform 0.2s, box-shadow 0.2s;
-  cursor: pointer;
-}
-
-.book-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.05);
-  border-color: var(--student-primary-border);
-}
-
-.book-cover-placeholder {
-  aspect-ratio: 2/3;
-  background-color: var(--code-bg);
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--student-primary);
-  font-weight: 700;
-  font-size: 14px;
-  text-align: center;
-  padding: 12px;
-  box-sizing: border-box;
-  border: 1px dashed var(--border);
-}
-
-.book-info {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.book-title {
-  font-weight: 600;
-  font-size: 14px;
-  color: var(--text-h);
   line-height: 1.3;
-  margin: 0;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
+  color: #ffffff !important;
 }
 
-.book-author {
-  font-size: 12px;
-  color: var(--text);
-  margin: 0;
-}
-
-/* Schedules List */
-.schedule-list {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.schedule-item {
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 14px 16px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 12px;
-  background-color: var(--bg);
-}
-
-.schedule-item.urgent {
-  border-left: 4px solid #ef4444;
-}
-
-.schedule-item.warning {
-  border-left: 4px solid #f59e0b;
-}
-
-.schedule-item.normal {
-  border-left: 4px solid #10b981;
-}
-
-.schedule-book-info {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.schedule-book-title {
-  font-weight: 600;
+.hero-banner-desc {
   font-size: 14px;
-  color: var(--text-h);
-  margin: 0;
+  line-height: 1.6;
+  opacity: 0.9;
+  margin: 0 0 24px 0;
 }
 
-.schedule-book-author {
-  font-size: 12px;
-  color: var(--text);
-  margin: 0;
-}
-
-.schedule-due {
-  text-align: right;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.due-date {
+.hero-banner-btn {
+  background-color: #ffffff;
+  color: #2563eb;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 20px;
   font-size: 13px;
-  font-weight: 600;
-  color: var(--text-h);
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
 }
 
-.due-badge {
-  font-size: 11px;
-  font-weight: 500;
-  padding: 2px 8px;
-  border-radius: 20px;
-  text-align: center;
+.hero-banner-btn:hover {
+  background-color: #f8fafc;
+  transform: translateY(-1px);
 }
 
-.due-badge.urgent {
-  background-color: rgba(239, 68, 68, 0.1);
-  color: #ef4444;
+.hero-banner-btn:active {
+  transform: translateY(0);
 }
 
-.due-badge.warning {
-  background-color: rgba(245, 158, 11, 0.1);
-  color: #f59e0b;
-}
-
-.due-badge.normal {
-  background-color: rgba(16, 185, 129, 0.1);
-  color: #10b981;
-}
-
-/* Target Membaca */
-.reading-target-card {
+/* Books Sections */
+.books-section {
   display: flex;
   flex-direction: column;
   gap: 16px;
 }
 
-.target-stats {
+.books-section-header {
   display: flex;
   justify-content: space-between;
-  align-items: baseline;
+  align-items: center;
 }
 
-.target-progress-text {
-  font-size: 32px;
+.books-section-title {
+  font-size: 16px;
   font-weight: 700;
-  color: var(--student-primary);
+  color: #0f172a;
+  margin: 0;
 }
 
-.target-total-text {
-  font-size: 14px;
-  color: var(--text);
+.books-section-link {
+  font-size: 11px;
+  font-weight: 700;
+  color: #2563eb;
+  text-decoration: none;
+  letter-spacing: 0.5px;
+  transition: color 0.15s ease;
 }
 
-.progress-bar-container {
+.books-section-link:hover {
+  color: #1d4ed8;
+  text-decoration: underline;
+}
+
+/* Books Grid & Cards */
+.books-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+@media (max-width: 900px) {
+  .books-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.book-card-item {
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+}
+
+.book-card-item:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 20px -5px rgba(0,0,0,0.06);
+  border-color: #cbd5e1;
+}
+
+.book-card-cover-wrapper {
   width: 100%;
-  height: 8px;
-  background-color: var(--code-bg);
-  border-radius: 4px;
+  aspect-ratio: 12 / 16;
+  border-radius: 6px;
+  overflow: hidden;
+  background-color: #f8fafc;
+  border: 1px solid #f1f5f9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.book-card-cover-img {
+  width: 100%;
+  height: 100%;
+  object-fit: fill;
+}
+
+.book-card-details {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.book-card-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0;
+  line-height: 1.4;
+  height: 2.8em;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.book-card-author {
+  font-size: 11px;
+  color: #64748b;
+  margin: 0;
+  white-space: pre-line;
+  line-height: 1.3;
+  height: 2.6em;
   overflow: hidden;
 }
 
-.progress-bar-fill {
-  height: 100%;
-  background-color: var(--student-primary);
-  border-radius: 4px;
-  transition: width 0.4s ease;
+.book-card-stock {
+  font-size: 11px;
+  color: #10b981;
+  font-weight: 700;
+  margin-top: 4px;
 }
 
-.target-message {
+/* Sidebar Date Card */
+.sidebar-date-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 14px 16px;
   font-size: 13px;
-  color: var(--text);
-  line-height: 1.4;
+  font-weight: 700;
+  color: #0f172a;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+}
+
+.date-card-icon {
+  font-size: 16px;
+}
+
+/* Sidebar Sections */
+.sidebar-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.sidebar-section-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #0f172a;
   margin: 0;
+}
+
+/* Schedule Cards */
+.schedule-cards-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.schedule-card {
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+}
+
+.schedule-card.urgent {
+  background-color: #fff5f5;
+  border-left: 4px solid #ef4444;
+}
+
+.schedule-card.normal {
+  background-color: #f0fdf4;
+  border-left: 4px solid #10b981;
+}
+
+.schedule-card-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.schedule-icon-box {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  flex-shrink: 0;
+}
+
+.schedule-icon-box.urgent {
+  background-color: #fee2e2;
+  color: #ef4444;
+}
+
+.schedule-icon-box.normal {
+  background-color: #dcfce7;
+  color: #10b981;
+}
+
+.schedule-info-box {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.schedule-book-name {
+  font-size: 12px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0;
+  line-height: 1.3;
+}
+
+.schedule-borrow-date {
+  font-size: 10px;
+  color: #64748b;
+}
+
+.schedule-due-box {
+  font-size: 12px;
+  font-weight: 700;
+  text-align: right;
+  display: flex;
+  justify-content: flex-start;
+  padding-left: 40px;
+}
+
+.schedule-due-box.urgent {
+  color: #ef4444;
+}
+
+.schedule-due-box.normal {
+  color: #10b981;
+}
+
+/* Reading Target Card */
+.target-section {
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+}
+
+.target-progress-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 4px;
+  margin-bottom: 8px;
+}
+
+.target-progress-qty {
+  font-size: 12px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.target-progress-percent {
+  font-size: 12px;
+  font-weight: 700;
+  color: #2563eb;
+}
+
+.target-progress-bar-wrapper {
+  width: 100%;
+  height: 8px;
+  background-color: #f1f5f9;
+  border-radius: 999px;
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+
+.target-progress-bar-fill {
+  height: 100%;
+  background-color: #2563eb;
+  border-radius: 999px;
+}
+
+.target-progress-footer {
+  font-size: 11px;
+  color: #64748b;
+  text-align: center;
+  margin: 0;
+  font-weight: 500;
+}
+
+/* Responsive Overrides */
+@media (max-width: 768px) {
+  .student-dashboard-wrapper {
+    flex-direction: column;
+  }
+  .dashboard-sidebar-column {
+    max-width: 100%;
+    width: 100%;
+  }
 }
