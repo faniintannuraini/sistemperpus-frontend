@@ -22,9 +22,9 @@ export default function Books() {
     alert('Aksi Tambah Buku dipicu (Modal form tambah buku akan muncul).');
   };
 
-  const handleDetail = (book) => {
-    alert(`Detail Buku: \nJudul: ${book.title}\nPenulis: ${book.author}\nKategori: ${book.category}\nStok: ${book.stock}\nStatus: ${book.status}`);
-  };
+  // const handleDetail = (book) => {
+  //   alert(`Detail Buku: \nJudul: ${book.title}\nPenulis: ${book.author}\nKategori: ${book.category}\nStok: ${book.stock}\nStatus: ${book.status}`);
+  // };
 
   const handleEdit = (book) => {
     alert(`Edit Buku: "${book.title}" (Modal form edit buku akan muncul).`);

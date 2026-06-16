@@ -48,20 +48,24 @@ export default function StudentLayout() {
       {/* Sidebar (260px or collapsed to 80px / fixed on mobile) */}
       <aside className={`student-sidebar ${!sidebarOpen ? 'collapsed' : ''} ${sidebarOpen ? 'open' : ''}`}>
         <div className="student-sidebar-brand">
-          <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M12 21C12 21 8.5 17 3 17V5C8.5 5 12 9 12 9M12 21C12 21 15.5 17 21 17V5C15.5 5 12 9 12 9M12 21V9"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-          <h2 className="brand-text">Sistem Perpustakaan</h2>
+          <div className="brand-logo-container">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect width="24" height="24" rx="6" fill="#2563eb" />
+              <g transform="translate(2.4, 2.4) scale(0.8)">
+                <path
+                  d="M12 21C12 21 8.5 17 3 17V5C8.5 5 12 9 12 9M12 21C12 21 15.5 17 21 17V5C15.5 5 12 9 12 9M12 21V9"
+                  stroke="#ffffff"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </g>
+            </svg>
+          </div>
+          <div className="brand-text-container">
+            <h2 className="brand-text brand-title">Perpustakaan</h2>
+            <span className="brand-text brand-subtitle">UNPER Tasikmalaya</span>
+          </div>
         </div>
 
         <ul className="student-sidebar-menu">
@@ -101,9 +105,6 @@ export default function StudentLayout() {
 
         <div className="student-sidebar-footer">
           <button className="student-logout-btn" onClick={handleLogout}>
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-            </svg>
             <span className="menu-text">Logout</span>
           </button>
         </div>
@@ -137,7 +138,7 @@ export default function StudentLayout() {
               <input
                 type="text"
                 className="search-input"
-                placeholder="Cari buku, penulis, atau kategori..."
+                placeholder="Cari judul buku, penulis, atau ISBN..."
               />
             </div>
           </div>
@@ -145,9 +146,10 @@ export default function StudentLayout() {
           <div className="student-navbar-right">
             <div className="user-profile-info">
               <div className="user-details">
-                <span className="user-name">Nama Mahasiswa</span>
+                <span className="user-name">Fani</span>
+                <span className="user-role">Teknik Informatika</span>
               </div>
-              <div className="user-avatar">NM</div>
+              <div className="user-avatar">F</div>
             </div>
           </div>
         </nav>

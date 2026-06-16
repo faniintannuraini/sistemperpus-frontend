@@ -1,9 +1,7 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import '../../styles/student-history.css';
 
 export default function History() {
-  const navigate = useNavigate();
   const [successNotice, setSuccessNotice] = useState('');
 
   // Dummy Initial Data
