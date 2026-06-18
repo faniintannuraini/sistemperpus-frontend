@@ -1,25 +1,38 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import '../../styles/student-books.css';
+
+// Import book cover images
+import pythonCover from '../../assets/images/python_book_cover.png';
+import mlCover from '../../assets/images/ml_book_cover.png';
+import cCover from '../../assets/images/c_book_cover.png';
+import accountingCover from '../../assets/images/accounting_book_cover.png';
+import ekonomiMikroCover from '../../assets/images/ekonomi_mikro_cover.png';
+import manajemenOperasionalCover from '../../assets/images/manajemen_operasional_cover.png';
+import algoritmaPemrogramanCover from '../../assets/images/algoritma_pemrograman_cover.png';
+import pengantarAkuntansiCover from '../../assets/images/pengantar_akuntansi_cover.png';
 
 export default function Books() {
   const navigate = useNavigate();
-  const [searchQuery, setSearchQuery] = useState('');
+  const location = useLocation();
   const [selectedCategory, setSelectedCategory] = useState('Semua');
 
-  // Dummy Categories
-  const categories = ['Semua', 'Teknologi', 'Sains', 'Bisnis', 'Sastra'];
+  // Read search query from URL query parameter 'q'
+  const searchQuery = new URLSearchParams(location.search).get('q') || '';
 
-  // Dummy Books Data
+  // Dummy Categories matching Figma
+  const categories = ['Semua', 'Informatika', 'Manajemen', 'Akuntansi'];
+
+  // Dummy Books Data matching Figma
   const booksData = [
-    { id: 1, title: 'Introduction to Algorithms', author: 'Thomas H. Cormen', category: 'Teknologi', stock: 5, emoji: '💻' },
-    { id: 2, title: 'Clean Code', author: 'Robert C. Martin', category: 'Teknologi', stock: 3, emoji: '🛠️' },
-    { id: 3, title: 'A Brief History of Time', author: 'Stephen Hawking', category: 'Sains', stock: 2, emoji: '🌌' },
-    { id: 4, title: 'Principles of Economics', author: 'N. Gregory Mankiw', category: 'Bisnis', stock: 0, emoji: '📈' },
-    { id: 5, title: 'The Great Gatsby', author: 'F. Scott Fitzgerald', category: 'Sastra', stock: 4, emoji: '📖' },
-    { id: 6, title: 'Design Patterns', author: 'Erich Gamma', category: 'Teknologi', stock: 1, emoji: '🧩' },
-    { id: 7, title: 'Cosmos', author: 'Carl Sagan', category: 'Sains', stock: 6, emoji: '🪐' },
-    { id: 8, title: 'Zero to One', author: 'Peter Thiel', category: 'Bisnis', stock: 3, emoji: '💡' },
+    { id: 1, title: 'Python Programming', author: 'Martin Evans', category: 'Informatika', stock: 2, year: '2022', cover: pythonCover },
+    { id: 2, title: 'Machine Learning For Beginners', author: 'Jerry N.P.', category: 'Informatika', stock: 2, year: '2022', cover: mlCover },
+    { id: 3, title: 'Expert C Programming', author: 'Peter Van Der Linden', category: 'Informatika', stock: 2, year: '2022', cover: cCover },
+    { id: 4, title: 'Pengantar Ekonomi Mikro', author: 'Sri Rahayu, S.E., M.Si.', category: 'Manajemen', stock: 2, year: '2022', cover: ekonomiMikroCover },
+    { id: 5, title: 'Akuntansi Keuangan Lanjutan', author: 'Endah Prawesti Ningrum, S.E, M.Ak', category: 'Akuntansi', stock: 2, year: '2022', cover: accountingCover },
+    { id: 6, title: 'Manajemen Operasional', author: 'Dr. H. Mochammad Zainul, S.E, M.M.', category: 'Manajemen', stock: 2, year: '2022', cover: manajemenOperasionalCover },
+    { id: 7, title: 'Algoritma Dan Pemrograman', author: 'Rinaldi Munir', category: 'Informatika', stock: 2, year: '2022', cover: algoritmaPemrogramanCover },
+    { id: 8, title: 'Pengantar Akuntansi', author: 'Iwan Koerniawan, S.E., M.Th., M.Si.', category: 'Akuntansi', stock: 2, year: '2022', cover: pengantarAkuntansiCover }
   ];
 
   // Filtering Logic
@@ -34,42 +47,16 @@ export default function Books() {
     return matchesSearch && matchesCategory;
   });
 
-  const handleDetailClick = (bookId) => {
-    navigate(`/student/book/${bookId}`);
-  };
-
   return (
     <div className="books-page-wrapper">
       {/* Page Header */}
       <div className="books-header">
-        <h1>Eksplorasi Katalog Buku</h1>
-        <p>Temukan ribuan referensi, jurnal, dan buku terbaik untuk dipinjam.</p>
+        <h1 className="books-page-title">Koleksi Buku</h1>
+        <p className="books-page-subtitle">Cari dan temukan referensi bacaanmu.</p>
       </div>
 
-      {/* Search and Filters Controls */}
+      {/* Controls: Search and Filters */}
       <div className="controls-container">
-        {/* Search Field */}
-        <div className="search-field">
-          <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M21 21L16.65 16.65M19 11C19 15.4183 15.4183 19 11 19C6.58172 19 3 15.4183 3 11C3 6.58172 6.58172 3 11 3C15.4183 3 19 6.58172 19 11Z"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-          <input
-            type="text"
-            placeholder="Cari berdasarkan judul atau penulis..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-        </div>
 
         {/* Category Filters */}
         <div className="category-filter">
@@ -89,29 +76,24 @@ export default function Books() {
       <div className="catalog-grid">
         {filteredBooks.length > 0 ? (
           filteredBooks.map((book) => (
-            <div key={book.id} className="catalog-card">
+            <div
+              key={book.id}
+              className="catalog-card"
+              onClick={() => navigate(`/student/book/${book.id}`)}
+              style={{ cursor: 'pointer' }}
+            >
               {/* Cover Container */}
               <div className="cover-container">
-                <span>{book.emoji}</span>
-                <span className={`stock-tag ${book.stock > 0 ? 'in-stock' : 'out-of-stock'}`}>
-                  {book.stock > 0 ? 'Tersedia' : 'Habis'}
-                </span>
+                <img src={book.cover} alt={book.title} className="cover-img" />
               </div>
 
               {/* Book Details */}
               <div className="book-details">
-                <span className="book-tag">{book.category}</span>
                 <h3 className="book-title-h3">{book.title}</h3>
                 <p className="book-author-p">{book.author}</p>
-                <p className="book-stock-p">
-                  <span>📦</span> Stok: {book.stock} buku
-                </p>
+                <p className="book-year-p">{book.year}</p>
+                <p className="book-stock-p">Stock : {book.stock}</p>
               </div>
-
-              {/* Action Button */}
-              <button className="detail-btn" onClick={() => handleDetailClick(book.id)}>
-                Detail Buku
-              </button>
             </div>
           ))
         ) : (

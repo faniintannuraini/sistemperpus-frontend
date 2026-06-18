@@ -139,6 +139,8 @@ export default function StudentLayout() {
                 type="text"
                 className="search-input"
                 placeholder="Cari judul buku, penulis, atau ISBN..."
+                value={new URLSearchParams(location.search).get('q') || ''}
+                onChange={(e) => navigate(`/student/explore?q=${encodeURIComponent(e.target.value)}`)}
               />
             </div>
           </div>
