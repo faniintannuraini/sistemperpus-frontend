@@ -3,246 +3,190 @@
 .books-page-wrapper {
   display: flex;
   flex-direction: column;
-  gap: 28px;
+  gap: 24px;
   max-width: 1200px;
   margin: 0 auto;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
 }
 
-/* Page Header & Stats */
+/* Page Header */
 .books-header {
   display: flex;
   flex-direction: column;
-  gap: 8px;
 }
 
-.books-header h1 {
-  font-size: 28px;
+.books-page-title {
+  font-size: 24px;
   font-weight: 700;
+  color: #0f172a;
   margin: 0;
-  color: var(--text-h);
   letter-spacing: -0.5px;
 }
 
-.books-header p {
-  font-size: 15px;
-  color: var(--text);
-  margin: 0;
+.books-page-subtitle {
+  font-size: 14px;
+  color: #64748b;
+  margin: 4px 0 0 0;
 }
 
-/* Search & Filter Controls */
+/* Filter Controls */
 .controls-container {
   display: flex;
-  gap: 16px;
-  flex-wrap: wrap;
+  justify-content: flex-start;
   align-items: center;
-  justify-content: space-between;
-  background-color: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 16px;
-  box-shadow: var(--shadow);
-}
-
-.search-field {
-  position: relative;
-  flex: 1;
-  min-width: 280px;
-}
-
-.search-field input {
-  width: 100%;
-  padding: 10px 16px 10px 42px;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  background-color: var(--code-bg);
-  color: var(--text-h);
-  font-size: 14px;
-  outline: none;
-  box-sizing: border-box;
-  transition: border-color 0.2s;
-}
-
-.search-field input:focus {
-  border-color: var(--student-primary);
-}
-
-.search-field svg {
-  position: absolute;
-  left: 14px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: var(--text);
-  width: 18px;
-  height: 18px;
+  margin-top: 8px;
 }
 
 /* Category Filter Bar */
 .category-filter {
   display: flex;
-  gap: 8px;
+  gap: 12px;
   flex-wrap: wrap;
 }
 
 .category-btn {
-  padding: 8px 16px;
-  border-radius: 20px;
-  border: 1px solid var(--border);
-  background-color: var(--bg);
-  color: var(--text);
-  font-size: 13px;
+  padding: 10px 24px;
+  border-radius: 8px;
+  border: none;
+  background-color: #e2e8f0;
+  color: #0f172a;
+  font-size: 14px;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .category-btn:hover {
-  background-color: var(--code-bg);
-  color: var(--text-h);
+  background-color: #cbd5e1;
 }
 
 .category-btn.active {
-  background-color: var(--student-primary);
-  border-color: var(--student-primary);
+  background-color: #3b82f6;
   color: #ffffff;
 }
 
 /* Catalog Grid */
 .catalog-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 24px;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 16px;
+  margin-top: 12px;
 }
 
+@media (max-width: 1200px) {
+  .catalog-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+@media (max-width: 900px) {
+  .catalog-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .catalog-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 400px) {
+  .catalog-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Catalog Card */
 .catalog-card {
-  background-color: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 16px;
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 12px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  box-shadow: var(--shadow);
+  gap: 10px;
   transition: transform 0.2s, box-shadow 0.2s;
 }
 
 .catalog-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.06);
-  border-color: var(--student-primary-border);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+  border-color: #cbd5e1;
 }
 
-/* Book Cover image container */
+/* Book Cover container */
 .cover-container {
-  aspect-ratio: 3/4;
-  background-color: var(--code-bg);
-  border-radius: 12px;
+  aspect-ratio: 3 / 4;
+  background-color: #f8fafc;
+  border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
   position: relative;
-  border: 1px solid var(--border);
-  font-size: 48px;
+  border: 1px solid #f1f5f9;
   overflow: hidden;
 }
 
-.stock-tag {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  padding: 4px 8px;
-  border-radius: 8px;
-  font-size: 11px;
-  font-weight: 600;
-}
-
-.stock-tag.in-stock {
-  background-color: rgba(16, 185, 129, 0.1);
-  color: #10b981;
-}
-
-.stock-tag.out-of-stock {
-  background-color: rgba(239, 68, 68, 0.1);
-  color: #ef4444;
+.cover-img {
+  width: 100%;
+  height: 100%;
+  object-fit: fill;
 }
 
 /* Book Info Section */
 .book-details {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  flex: 1;
-}
-
-.book-meta {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.book-tag {
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--student-primary);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+  gap: 2px;
 }
 
 .book-title-h3 {
-  font-size: 15px;
-  font-weight: 600;
-  color: var(--text-h);
+  font-size: 13px;
+  font-weight: 700;
+  color: #0f172a;
   line-height: 1.4;
   margin: 0;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
+  height: 2.8em;
 }
 
 .book-author-p {
-  font-size: 13px;
-  color: var(--text);
+  font-size: 11px;
+  color: #64748b;
+  margin: 2px 0 0 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.book-year-p {
+  font-size: 11px;
+  color: #64748b;
   margin: 0;
 }
 
 .book-stock-p {
-  font-size: 12px;
-  color: var(--text);
-  margin: auto 0 0 0;
-  display: flex;
-  align-items: center;
-  gap: 6px;
+  font-size: 11px;
+  color: #10b981;
+  font-weight: 700;
+  margin: 4px 0 0 0;
 }
 
-/* Detail Button */
-.detail-btn {
-  width: 100%;
-  padding: 10px;
-  border-radius: 8px;
-  border: 1px solid var(--student-primary);
-  background-color: transparent;
-  color: var(--student-primary);
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-}
-
-.detail-btn:hover {
-  background-color: var(--student-primary);
-  color: #ffffff;
+/* Hide custom page search bar if we use navbar search */
+.search-field-custom {
+  display: none;
 }
 
 .no-results {
   grid-column: 1 / -1;
   text-align: center;
   padding: 48px;
-  background-color: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  color: var(--text);
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  color: #64748b;
 }
