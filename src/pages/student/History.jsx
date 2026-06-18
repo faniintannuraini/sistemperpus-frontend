@@ -1,105 +1,99 @@
 import React, { useState } from 'react';
 import '../../styles/student-history.css';
 
+// Import cover images
+import mlCover from '../../assets/images/ml_book_cover.png';
+
 export default function History() {
   const [successNotice, setSuccessNotice] = useState('');
 
-  // Dummy Initial Data
+  // Dummy Stats matching Figma
   const stats = {
-    totalLoans: 12,
-    onTimeReturns: 10,
-    lateReturns: 2,
+    total: 2,
+    onTime: 1,
+    late: 1
   };
 
+  // Dummy History data matching Figma
   const historyData = [
     {
       id: 1,
-      title: 'Introduction to Algorithms',
-      author: 'Thomas H. Cormen',
-      borrowDate: '10 Jan 2026',
-      returnDate: '24 Jan 2026',
-      status: 'Dikembalikan',
-      emoji: '💻',
+      title: 'Programming',
+      author: 'Abdur Rahman',
+      year: '2022',
+      borrowDate: '02 Mar 2026',
+      returnDate: '09 Mar 2026',
+      status: 'Tepat Waktu',
+      cover: null // No cover image shown in Figma for the first card
     },
     {
       id: 2,
-      title: 'Clean Code',
-      author: 'Robert C. Martin',
-      borrowDate: '01 Feb 2026',
-      returnDate: '15 Feb 2026',
-      status: 'Dikembalikan',
-      emoji: '🛠️',
-    },
-    {
-      id: 3,
-      title: 'Principles of Economics',
-      author: 'N. Gregory Mankiw',
-      borrowDate: '10 Mar 2026',
-      returnDate: '30 Mar 2026',
-      status: 'Terlambat', // Overdue return history
-      emoji: '📈',
-    },
-    {
-      id: 4,
-      title: 'The Great Gatsby',
-      author: 'F. Scott Fitzgerald',
-      borrowDate: '05 Apr 2026',
-      returnDate: '19 Apr 2026',
-      status: 'Dikembalikan',
-      emoji: '📖',
-    },
+      title: 'Programming', // "Machine Learning for Beginners" shown as "Programming" in Figma mockup
+      subtitle: 'Machine Learning for Beginners',
+      author: 'Abdur Rahman',
+      year: '2022',
+      borrowDate: '02 Mar 2026',
+      returnDate: '09 Mar 2026',
+      status: 'Terlambat',
+      cover: mlCover
+    }
   ];
 
   const handleReborrow = (title) => {
-    setSuccessNotice(`Buku "${title}" berhasil diajukan untuk peminjaman baru!`);
+    setSuccessNotice(`Buku "${title}" berhasil diajukan untuk pinjam lagi!`);
     setTimeout(() => {
       setSuccessNotice('');
-    }, 4000);
+    }, 3000);
   };
 
   return (
     <div className="history-page-wrapper">
       {/* Page Header */}
       <div className="history-header">
-        <h1>Riwayat Peminjaman</h1>
-        <p>Lihat daftar seluruh buku yang pernah Anda pinjam dan kembalikan sebelumnya.</p>
+        <h1 className="history-title-main">Riwayat Pinjaman</h1>
+        <p className="history-subtitle-main">
+          Catatan buku yang pernah kamu pinjam dan kembalikan.
+        </p>
       </div>
 
-      {/* Stats Summary Cards Row (Height 90px, Soft Colors) */}
+      {/* Stats Cards Row */}
       <div className="history-stats-row">
+        {/* Card 1: Total */}
         <div className="history-stat-card">
-          <div className="history-stat-content">
-            <span className="history-stat-label">Total Pinjam</span>
-            <span className="history-stat-number">{stats.totalLoans} Buku</span>
-          </div>
-          <div className="history-stat-icon-wrapper blue">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+          <div className="stat-icon-box blue-box">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="stat-icon">
+              <path d="M19 3H5C3.9 3 3 3.9 3 5V19C3 20.1 3.9 21 5 21H19C20.1 21 21 20.1 21 19V5C21 3.9 20.1 3 19 3ZM16 17H8V15H16V17ZM16 13H8V11H16V13ZM16 9H8V7H16V9Z" fill="#2563eb"/>
             </svg>
+          </div>
+          <div className="stat-text-box">
+            <span className="stat-label">Total Buku Dipinjam</span>
+            <span className="stat-number">{stats.total} Buku</span>
           </div>
         </div>
 
+        {/* Card 2: Tepat Waktu */}
         <div className="history-stat-card">
-          <div className="history-stat-content">
-            <span className="history-stat-label">Tepat Waktu</span>
-            <span className="history-stat-number">{stats.onTimeReturns} Buku</span>
-          </div>
-          <div className="history-stat-icon-wrapper green">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          <div className="stat-icon-box green-box">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="stat-icon">
+              <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM10 17L5 12L6.41 10.59L10 14.17L17.59 6.58L19 8L10 17Z" fill="#10b981"/>
             </svg>
+          </div>
+          <div className="stat-text-box">
+            <span className="stat-label">Tepat Waktu</span>
+            <span className="stat-number">{stats.onTime} Buku</span>
           </div>
         </div>
 
+        {/* Card 3: Terlambat */}
         <div className="history-stat-card">
-          <div className="history-stat-content">
-            <span className="history-stat-label">Terlambat Kembali</span>
-            <span className="history-stat-number">{stats.lateReturns} Buku</span>
-          </div>
-          <div className="history-stat-icon-wrapper purple">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+          <div className="stat-icon-box red-box">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="stat-icon">
+              <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM13 17H11V15H13V17ZM13 13H11V7H13V13Z" fill="#ef4444"/>
             </svg>
+          </div>
+          <div className="stat-text-box">
+            <span className="stat-label">Terlambat</span>
+            <span className="stat-number">{stats.late} Buku</span>
           </div>
         </div>
       </div>
@@ -114,51 +108,54 @@ export default function History() {
         </div>
       )}
 
-      {/* Main Container Card Wrapping List */}
-      <div className="history-list-card">
-        <div className="history-list-header">
-          <h2 className="history-list-title">Riwayat Transaksi Buku</h2>
-        </div>
+      {/* History Cards Stack */}
+      <div className="history-stack">
+        {historyData.map((item) => {
+          const isLate = item.status === 'Terlambat';
+          
+          return (
+            <div key={item.id} className="history-card-item">
+              {/* Left Side: Cover & Info */}
+              <div className="card-left-section">
+                {item.cover ? (
+                  <div className="book-cover-wrapper">
+                    <img src={item.cover} alt={item.title} className="book-cover-img" />
+                  </div>
+                ) : (
+                  <div className="book-cover-wrapper-empty"></div>
+                )}
+                
+                <div className="book-info-wrapper">
+                  <h3 className="book-title">
+                    {item.title}
+                    {item.subtitle && <span className="book-subtitle-text"> ({item.subtitle})</span>}
+                  </h3>
+                  <p className="book-author">{item.author}</p>
+                  <p className="book-year">{item.year}</p>
 
-        <div className="history-items-container">
-          {historyData.map((item) => (
-            <div key={item.id} className="history-item-card">
-              
-              {/* 1. Cover (70px x 95px) */}
-              <div className="history-cover">
-                {item.emoji}
-              </div>
-
-              {/* 2. Informasi Buku (Judul, Penulis + Tanggal) */}
-              <div className="history-info-col">
-                <h3 className="history-book-title">{item.title}</h3>
-                <p className="history-book-author">{item.author}</p>
-                <div className="history-book-dates">
-                  <span className="history-date-item">Pinjam: <strong>{item.borrowDate}</strong></span>
-                  <span className="history-date-item">Kembali: <strong>{item.returnDate}</strong></span>
+                  <div className="borrow-details-list">
+                    <p className="detail-item">Pinjam: {item.borrowDate}</p>
+                    <p className="detail-item">Kembali: {item.returnDate}</p>
+                  </div>
                 </div>
               </div>
 
-              {/* 3. Status Badge (Returned / Lost / Late) */}
-              <div className="history-status-col">
-                <span className={`history-status-badge ${item.status === 'Terlambat' ? 'lost' : 'returned'}`}>
+              {/* Right Side: Status Badge & Pinjam Lagi Button */}
+              <div className="card-right-section">
+                <span className={`status-badge-custom ${isLate ? 'badge-red-history' : 'badge-green-history'}`}>
                   {item.status}
                 </span>
-              </div>
 
-              {/* 4. Action Button (Pinjam Lagi) */}
-              <div className="history-actions">
                 <button
-                  className="pinjam-lagi-btn"
+                  className="pinjam-lagi-btn-custom"
                   onClick={() => handleReborrow(item.title)}
                 >
                   Pinjam Lagi
                 </button>
               </div>
-
             </div>
-          ))}
-        </div>
+          );
+        })}
       </div>
     </div>
   );
