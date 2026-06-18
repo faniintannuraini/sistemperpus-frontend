@@ -5,20 +5,17 @@ export default function Users() {
     'Semua Program Studi',
     'Teknik Informatika',
     'Sistem Informasi',
-    'Desain Komunikasi Visual',
-    'Manajemen Bisnis',
-    'Teknik Elektro'
+    'Teknik Sipil'
   ];
 
   const initialUsers = [
-    { id: 1, name: 'Budi Santoso', nim: '120220001', prodi: 'Teknik Informatika', email: 'budi@mhs.ac.id', status: 'Aktif' },
-    { id: 2, name: 'Siti Aminah', nim: '120220002', prodi: 'Sistem Informasi', email: 'siti@mhs.ac.id', status: 'Aktif' },
-    { id: 3, name: 'Rian Hidayat', nim: '120220003', prodi: 'Desain Komunikasi Visual', email: 'rian@mhs.ac.id', status: 'Aktif' },
-    { id: 4, name: 'Dewi Lestari', nim: '120220004', prodi: 'Manajemen Bisnis', email: 'dewi@mhs.ac.id', status: 'Aktif' },
-    { id: 5, name: 'Fajar Nugraha', nim: '120220005', prodi: 'Teknik Informatika', email: 'fajar@mhs.ac.id', status: 'Aktif' },
-    { id: 6, name: 'Indra Wijaya', nim: '120220006', prodi: 'Teknik Elektro', email: 'indra@mhs.ac.id', status: 'Aktif' },
-    { id: 7, name: 'Lani Rahmawati', nim: '120220007', prodi: 'Sistem Informasi', email: 'lani@mhs.ac.id', status: 'Aktif' },
-    { id: 8, name: 'Rizky Pratama', nim: '120220008', prodi: 'Desain Komunikasi Visual', email: 'rizky@mhs.ac.id', status: 'Aktif' }
+    { id: 1, name: 'Azizah Nur Rahma', nim: '2201010', prodi: 'Teknik Informatika', email: 'azizah@student.unper.ac.id', status: 'Aktif' },
+    { id: 2, name: 'Hesti Wahyuni', nim: '2201011', prodi: 'Teknik Informatika', email: 'hesti@student.unper.ac.id', status: 'Aktif' },
+    { id: 3, name: 'Fani Intan Nuraini', nim: '2201012', prodi: 'Teknik Informatika', email: 'fani@student.unper.ac.id', status: 'Aktif' },
+    { id: 4, name: 'Maurine Fladya A', nim: '2201013', prodi: 'Teknik Informatika', email: 'mauri@student.unper.ac.id', status: 'Aktif' },
+    { id: 5, name: 'Euis Samsiah', nim: '2201014', prodi: 'Teknik Informatika', email: 'euis@student.unper.ac.id', status: 'Aktif' },
+    { id: 6, name: 'Esti Hartati', nim: '2201015', prodi: 'Teknik Informatika', email: 'esti@student.unper.ac.id', status: 'Aktif' },
+    { id: 7, name: 'Irzha Wiardi P', nim: '2201016', prodi: 'Teknik Informatika', email: 'irzha@student.unper.ac.id', status: 'Aktif' }
   ];
 
   const [users, setUsers] = useState(initialUsers);
@@ -46,17 +43,20 @@ export default function Users() {
 
   return (
     <div style={{
-      fontFamily: 'Inter, system-ui, -apple-system, sans-serif',
+      fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
       display: 'flex',
       flexDirection: 'column',
       gap: '24px',
-      color: '#1e293b'
+      color: '#1e293b',
+      maxWidth: '1200px',
+      margin: '0 auto',
+      boxSizing: 'border-box'
     }}>
       {/* Title Header */}
       <div>
         <h1 style={{
           margin: 0,
-          fontSize: '28px',
+          fontSize: '24px',
           fontWeight: 700,
           color: '#0f172a',
           letterSpacing: '-0.5px'
@@ -86,13 +86,12 @@ export default function Users() {
           onChange={(e) => setSelectedProdi(e.target.value)}
           style={{
             backgroundColor: '#ffffff',
-            border: '1px solid #e2e8f0',
-            borderRadius: '10px',
-            padding: '9px 14px',
+            border: '1px solid #cbd5e1',
+            borderRadius: '8px',
+            padding: '10px 16px',
             fontSize: '14px',
             color: '#334155',
             outline: 'none',
-            boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.02)',
             cursor: 'pointer',
             minWidth: '200px'
           }}
@@ -105,24 +104,23 @@ export default function Users() {
         {/* Tambah Mahasiswa Button */}
         <button
           onClick={handleAddUser}
-          className="tambah-user-btn"
+          className="admin-add-btn-user"
           style={{
-            backgroundColor: '#10b981', // green accent
+            backgroundColor: '#10b981', // Green background
             color: '#ffffff',
             border: 'none',
-            borderRadius: '10px',
-            padding: '10px 18px',
+            borderRadius: '8px',
+            padding: '10px 20px',
             fontSize: '14px',
             fontWeight: 600,
             cursor: 'pointer',
             display: 'flex',
             alignItems: 'center',
             gap: '8px',
-            transition: 'background-color 0.2s, transform 0.1s',
-            boxShadow: '0 4px 6px -1px rgba(16, 185, 129, 0.1), 0 2px 4px -1px rgba(16, 185, 129, 0.06)'
+            transition: 'background-color 0.2s ease'
           }}
         >
-          <svg style={{ width: '18px', height: '18px' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+          <svg style={{ width: '16px', height: '16px' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
             <path strokeLinecap="round" strokeLinejoin="round" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
           </svg>
           <span>Tambah Mahasiswa</span>
@@ -132,109 +130,131 @@ export default function Users() {
       {/* Main Table Card */}
       <div style={{
         backgroundColor: '#ffffff',
-        borderRadius: '16px',
         border: '1px solid #e2e8f0',
-        boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.02), 0 1px 2px 0 rgba(0, 0, 0, 0.06)',
-        overflow: 'hidden'
+        borderRadius: '12px',
+        overflow: 'hidden',
+        boxShadow: '0 1px 3px rgba(0, 0, 0, 0.02)'
       }}>
         {filteredUsers.length > 0 ? (
           <div style={{ overflowX: 'auto' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+            <table style={{
+              width: '100%',
+              borderCollapse: 'collapse',
+              textAlign: 'left'
+            }}>
               <thead>
-                <tr style={{ borderBottom: '1px solid #e2e8f0', backgroundColor: '#fafafb' }}>
-                  <th style={{ padding: '16px 20px', color: '#64748b', fontSize: '12px', fontWeight: 600 }}>DATA MAHASISWA</th>
-                  <th style={{ padding: '16px 20px', color: '#64748b', fontSize: '12px', fontWeight: 600 }}>PROGRAM STUDI</th>
-                  <th style={{ padding: '16px 20px', color: '#64748b', fontSize: '12px', fontWeight: 600 }}>EMAIL</th>
-                  <th style={{ padding: '16px 20px', color: '#64748b', fontSize: '12px', fontWeight: 600 }}>STATUS</th>
-                  <th style={{ padding: '16px 20px', color: '#64748b', fontSize: '12px', fontWeight: 600, textAlign: 'center', width: '150px' }}>AKSI</th>
+                <tr style={{
+                  borderBottom: '1px solid #e2e8f0',
+                  backgroundColor: '#fafafb'
+                }}>
+                  <th style={{ padding: '16px 24px', color: '#64748b', fontSize: '14px', fontWeight: 600 }}>Data Mahasiswa</th>
+                  <th style={{ padding: '16px 24px', color: '#64748b', fontSize: '14px', fontWeight: 600 }}>Program Studi</th>
+                  <th style={{ padding: '16px 24px', color: '#64748b', fontSize: '14px', fontWeight: 600 }}>Email</th>
+                  <th style={{ padding: '16px 24px', color: '#64748b', fontSize: '14px', fontWeight: 600 }}>Status</th>
+                  <th style={{ padding: '16px 24px', color: '#64748b', fontSize: '14px', fontWeight: 600, width: '120px' }}>Aksi</th>
                 </tr>
               </thead>
               <tbody>
-                {filteredUsers.map((user, idx) => (
+                {filteredUsers.map((user, index) => (
                   <tr
                     key={user.id}
-                    className="table-row-hover"
                     style={{
-                      borderBottom: idx !== filteredUsers.length - 1 ? '1px solid #f1f5f9' : 'none',
-                      transition: 'background-color 0.2s'
+                      borderBottom: index !== filteredUsers.length - 1 ? '1px solid #e2e8f0' : 'none'
                     }}
                   >
                     {/* Student Data Column (Name & NIM) */}
-                    <td style={{ padding: '14px 20px' }}>
-                      <div style={{ fontWeight: 600, fontSize: '14px', color: '#0f172a' }}>{user.name}</div>
+                    <td style={{ padding: '16px 24px' }}>
+                      <div style={{ fontWeight: 700, fontSize: '14px', color: '#0f172a' }}>{user.name}</div>
                       <div style={{ fontSize: '12px', color: '#64748b', marginTop: '2px' }}>NIM: {user.nim}</div>
                     </td>
 
                     {/* Program Studi Column */}
-                    <td style={{ padding: '14px 20px', fontSize: '13px', color: '#475569' }}>
+                    <td style={{
+                      padding: '16px 24px',
+                      fontSize: '14px',
+                      fontWeight: 700,
+                      color: '#334155'
+                    }}>
                       {user.prodi}
                     </td>
 
                     {/* Email Column */}
-                    <td style={{ padding: '14px 20px', fontSize: '13px', color: '#475569' }}>
+                    <td style={{
+                      padding: '16px 24px',
+                      fontSize: '14px',
+                      fontWeight: 500,
+                      color: '#334155'
+                    }}>
                       {user.email}
                     </td>
 
                     {/* Status Column */}
-                    <td style={{ padding: '14px 20px' }}>
+                    <td style={{ padding: '16px 24px' }}>
                       <span style={{
-                        backgroundColor: 'rgba(16, 185, 129, 0.08)',
+                        backgroundColor: '#dcfce7',
                         color: '#10b981',
-                        padding: '4px 10px',
-                        borderRadius: '9999px',
-                        fontSize: '11px',
-                        fontWeight: 600,
-                        whiteSpace: 'nowrap'
+                        padding: '6px 14px',
+                        borderRadius: '12px',
+                        fontSize: '12px',
+                        fontWeight: 700,
+                        display: 'inline-block'
                       }}>
                         {user.status}
                       </span>
                     </td>
 
                     {/* Actions Column */}
-                    <td style={{ padding: '14px 20px', textAlign: 'center' }}>
-                      <div style={{ display: 'flex', gap: '8px', justifyContent: 'center' }}>
+                    <td style={{ padding: '16px 24px' }}>
+                      <div style={{ display: 'flex', gap: '8px' }}>
                         {/* Edit Button */}
                         <button
                           onClick={() => handleEdit(user)}
-                          className="action-btn-edit"
-                          aria-label="Edit Mahasiswa"
+                          title="Edit Mahasiswa"
                           style={{
-                            border: '1px solid #dbeafe',
-                            backgroundColor: '#eff6ff',
-                            color: '#2563eb',
-                            borderRadius: '8px',
-                            padding: '8px 10px',
+                            width: '32px',
+                            height: '32px',
+                            borderRadius: '6px',
+                            backgroundColor: '#ffffff',
+                            border: '1.5px solid #f97316',
+                            color: '#f97316',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
                             cursor: 'pointer',
-                            transition: 'all 0.2s'
+                            transition: 'all 0.2s ease'
                           }}
+                          className="admin-edit-action-btn-user"
                         >
-                          <svg style={{ width: '15px', height: '15px' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ width: '16px', height: '16px' }}>
+                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                            <path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
                           </svg>
                         </button>
+
                         {/* Hapus Button */}
                         <button
                           onClick={() => handleHapus(user.id)}
-                          className="action-btn-delete"
-                          aria-label="Hapus Mahasiswa"
+                          title="Hapus Mahasiswa"
                           style={{
-                            border: '1px solid #fee2e2',
-                            backgroundColor: '#fef2f2',
+                            width: '32px',
+                            height: '32px',
+                            borderRadius: '6px',
+                            backgroundColor: '#ffffff',
+                            border: '1.5px solid #ef4444',
                             color: '#ef4444',
-                            borderRadius: '8px',
-                            padding: '8px 10px',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
                             cursor: 'pointer',
-                            transition: 'all 0.2s'
+                            transition: 'all 0.2s ease'
                           }}
+                          className="admin-delete-action-btn-user"
                         >
-                          <svg style={{ width: '15px', height: '15px' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ width: '16px', height: '16px' }}>
+                            <polyline points="3 6 5 6 21 6" />
+                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                            <line x1="10" y1="11" x2="10" y2="17" />
+                            <line x1="14" y1="11" x2="14" y2="17" />
                           </svg>
                         </button>
                       </div>
@@ -255,27 +275,20 @@ export default function Users() {
         )}
       </div>
 
-      {/* Styles Injection */}
+      {/* Style overrides */}
       <style>{`
-        .tambah-user-btn:hover {
+        .admin-add-btn-user:hover {
           background-color: #059669 !important;
-          transform: translateY(-1px);
         }
-        .tambah-user-btn:active {
-          transform: translateY(0);
+        .admin-edit-action-btn-user:hover {
+          background-color: #fff7ed !important;
+          border-color: #ea580c !important;
+          color: #ea580c !important;
         }
-        .table-row-hover:hover {
-          background-color: #f8fafc;
-        }
-        .action-btn-edit:hover {
-          background-color: #2563eb !important;
-          color: #ffffff !important;
-          border-color: #2563eb !important;
-        }
-        .action-btn-delete:hover {
-          background-color: #ef4444 !important;
-          color: #ffffff !important;
-          border-color: #ef4444 !important;
+        .admin-delete-action-btn-user:hover {
+          background-color: #fef2f2 !important;
+          border-color: #dc2626 !important;
+          color: #dc2626 !important;
         }
       `}</style>
     </div>
