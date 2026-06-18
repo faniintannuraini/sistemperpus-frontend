@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import '../../styles/student-history.css';
 
 // Import cover images
+import pythonCover from '../../assets/images/python_book_cover.png';
 import mlCover from '../../assets/images/ml_book_cover.png';
 
 export default function History() {
@@ -24,7 +25,7 @@ export default function History() {
       borrowDate: '02 Mar 2026',
       returnDate: '09 Mar 2026',
       status: 'Tepat Waktu',
-      cover: null // No cover image shown in Figma for the first card
+      cover: pythonCover
     },
     {
       id: 2,
