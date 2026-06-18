@@ -2,163 +2,283 @@ import React from 'react';
 
 export default function Dashboard() {
   const stats = [
-    { title: 'Total Buku', count: '1,240', icon: '📚', change: '+12 buku baru minggu ini', color: '#2563eb', bg: 'rgba(37, 99, 235, 0.05)' },
-    { title: 'Total User', count: '450', icon: '👥', change: '+8 anggota baru hari ini', color: '#10b981', bg: 'rgba(16, 185, 129, 0.05)' },
-    { title: 'Buku Dipinjam', count: '84', icon: '📖', change: '12 buku menunggu diambil', color: '#f59e0b', bg: 'rgba(245, 158, 11, 0.05)' },
-    { title: 'Denda Aktif', count: 'Rp 150,000', icon: '⚠️', change: 'Dari 5 peminjam terlambat', color: '#ef4444', bg: 'rgba(239, 68, 68, 0.05)' }
+    {
+      title: 'Total Buku',
+      count: '1459 Buku',
+      icon: (
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ width: '24px', height: '24px' }}>
+          <path d="M19 3H5C3.9 3 3 3.9 3 5V19C3 20.1 3.9 21 5 21H19C20.1 21 21 20.1 21 19V5C21 3.9 20.1 3 19 3ZM16 17H8V15H16V17ZM16 13H8V11H16V13ZM16 9H8V7H16V9Z" fill="#2563eb"/>
+        </svg>
+      ),
+      bg: '#eff6ff'
+    },
+    {
+      title: 'Total User (Mahasiswa)',
+      count: '892 Buku', // Matching Figma mockup typo exactly
+      icon: (
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ width: '24px', height: '24px' }}>
+          <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5s-3 1.34-3 3 1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5 5 6.34 5 8s1.34 3 3 3zm0 2.02c-2.33 0-7 1.17-7 3.5V19h14v-2.48c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.43V19h6v-2.48c0-2.33-4.67-3.5-7-3.5z" fill="#10b981"/>
+        </svg>
+      ),
+      bg: '#dcfce7'
+    },
+    {
+      title: 'Buku Sedang Dipinjam',
+      count: '128 Buku',
+      icon: (
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ width: '24px', height: '24px' }}>
+          <path d="M5 4v2h14V4H5zm0 10h4v6H5v-6zm10 0h4v6h-4v-6zm-5-5h4v11h-4V9z" fill="#a855f7"/>
+        </svg>
+      ),
+      bg: '#f3e8ff'
+    },
+    {
+      title: 'Denda Belum Dibayar',
+      count: '14 User',
+      icon: (
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ width: '24px', height: '24px' }}>
+          <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM13 17H11V15H13V17ZM13 13H11V7H13V13Z" fill="#ef4444"/>
+        </svg>
+      ),
+      bg: '#fee2e2'
+    }
   ];
 
-  const requests = [
-    { name: 'Budi Santoso', book: 'Pengantar Algoritma dan Struktur Data', date: '05 Juni 2026', status: 'Menunggu Diambil', badgeColor: '#2563eb', badgeBg: 'rgba(37, 99, 235, 0.08)' },
-    { name: 'Siti Aminah', book: 'Pemrograman Web Modern dengan React', date: '04 Juni 2026', status: 'Menunggu Diambil', badgeColor: '#2563eb', badgeBg: 'rgba(37, 99, 235, 0.08)' },
-    { name: 'Rian Hidayat', book: 'Dasar-Dasar Desain Grafis', date: '04 Juni 2026', status: 'Sedang Dipinjam', badgeColor: '#10b981', badgeBg: 'rgba(16, 185, 129, 0.08)' },
-    { name: 'Dewi Lestari', book: 'Analisis Data dengan Python', date: '03 Juni 2026', status: 'Terlambat', badgeColor: '#ef4444', badgeBg: 'rgba(239, 68, 68, 0.08)' }
+  const approvalRequests = [
+    {
+      name: 'Azizah Nur Rahma',
+      nim: '2201010',
+      book: 'Python Programming',
+      status: 'Menunggu Diambil'
+    },
+    {
+      name: 'Hesti Wahyuni',
+      nim: '2201011',
+      book: 'Machine Learning',
+      status: 'Menunggu Diambil'
+    },
+    {
+      name: 'Fani Intan Nuraini',
+      nim: '2201012',
+      book: 'Expert C Programming',
+      status: 'Menunggu Diambil'
+    }
   ];
-
-  const activities = [
-    { user: 'Admin', desc: 'Menambahkan 5 buku kategori Teknologi Informasi', time: '10 menit yang lalu' },
-    { user: 'Budi Santoso', desc: 'Mengajukan peminjaman buku "Pengantar Algoritma"', time: '25 menit yang lalu' },
-    { user: 'Siti Aminah', desc: 'Mengembalikan buku "UI/UX Design Essentials"', time: '1 jam yang lalu' },
-    { user: 'Rian Hidayat', desc: 'Melakukan pembayaran denda keterlambatan', time: '2 jam yang lalu' },
-    { user: 'Dewi Lestari', desc: 'Mendaftar sebagai anggota perpustakaan baru', time: '3 jam yang lalu' }
-  ];
-
-  const quickOverview = {
-    lateBooks: [
-      { title: 'Logika Matematika', user: 'Dewi Lestari', days: '3 hari terlambat' },
-      { title: 'Jaringan Komputer', user: 'Fajar Nugraha', days: '1 hari terlambat' }
-    ],
-    borrowedToday: [
-      { title: 'Pemrograman Web Modern', category: 'Teknologi' },
-      { title: 'Dasar-Dasar Desain Grafis', category: 'Desain' },
-      { title: 'Kecerdasan Buatan', category: 'Teknologi' }
-    ],
-    activeUsers: [
-      { name: 'Budi Santoso', info: '3 peminjaman aktif' },
-      { name: 'Siti Aminah', info: '2 peminjaman aktif' },
-      { name: 'Rian Hidayat', info: '2 peminjaman aktif' }
-    ]
-  };
 
   return (
     <div style={{
-      fontFamily: 'Inter, system-ui, -apple-system, sans-serif',
+      fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
       display: 'flex',
       flexDirection: 'column',
-      gap: '28px',
-      color: '#1e293b'
+      gap: '24px',
+      color: '#1e293b',
+      maxWidth: '1200px',
+      margin: '0 auto',
+      boxSizing: 'border-box'
     }}>
-      {/* Header Dashboard */}
+      {/* Title Header */}
       <div>
         <h1 style={{
           margin: 0,
-          fontSize: '28px',
+          fontSize: '24px',
           fontWeight: 700,
           color: '#0f172a',
-          letterSpacing: '-0.5px',
-          lineHeight: '1.2'
+          letterSpacing: '-0.5px'
         }}>
           Halo, Admin!
         </h1>
         <p style={{
-          margin: '6px 0 0 0',
+          margin: '4px 0 0 0',
           fontSize: '14px',
-          color: '#64748b',
-          fontWeight: 400
+          color: '#64748b'
         }}>
-          Berikut adalah ringkasan aktivitas dan status operasional perpustakaan hari ini.
+          Berikut adalah ringkasan data perpustakaan hari ini.
         </p>
       </div>
 
-      {/* Statistik Ringkas (4 Cards) */}
+      {/* Stats row */}
       <div style={{
         display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-        gap: '20px'
-      }}>
-        {stats.map((stat, idx) => (
+        gridTemplateColumns: 'repeat(4, 1fr)',
+        gap: '20px',
+        marginTop: '8px'
+      }} className="admin-stats-grid">
+        {stats.map((stat, index) => (
           <div
-            key={idx}
-            className="stat-card-hover"
+            key={index}
             style={{
               backgroundColor: '#ffffff',
-              borderRadius: '16px',
-              padding: '20px',
               border: '1px solid #e2e8f0',
-              boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.02), 0 1px 2px 0 rgba(0, 0, 0, 0.06)',
+              borderRadius: '12px',
+              padding: '16px 20px',
+              height: '80px',
               display: 'flex',
-              flexDirection: 'column',
-              gap: '12px',
-              transition: 'transform 0.2s ease, box-shadow 0.2s ease',
-              cursor: 'default'
+              alignItems: 'center',
+              gap: '16px',
+              boxSizing: 'border-box'
             }}
           >
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <span style={{ fontSize: '13px', color: '#64748b', fontWeight: 500 }}>{stat.title}</span>
-              <div style={{
-                backgroundColor: stat.bg,
-                color: stat.color,
-                fontSize: '20px',
-                width: '40px',
-                height: '40px',
-                borderRadius: '12px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center'
-              }}>
-                {stat.icon}
-              </div>
+            <div style={{
+              width: '48px',
+              height: '48px',
+              borderRadius: '8px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              backgroundColor: stat.bg,
+              flexShrink: 0
+            }} className="stat-icon-wrapper">
+              {stat.icon}
             </div>
-            <div>
-              <h3 style={{ margin: 0, fontSize: '24px', fontWeight: 700, color: '#0f172a' }}>{stat.count}</h3>
-              <span style={{ fontSize: '11px', color: '#64748b', fontWeight: 400, marginTop: '4px', display: 'block' }}>{stat.change}</span>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+              <span style={{
+                fontSize: '11px',
+                fontWeight: 500,
+                color: '#64748b',
+                textTransform: 'uppercase',
+                letterSpacing: '0.5px'
+              }}>{stat.title}</span>
+              <span style={{
+                fontSize: '20px',
+                fontWeight: 700,
+                color: '#0f172a',
+                lineHeight: 1
+              }}>{stat.count}</span>
             </div>
           </div>
         ))}
       </div>
 
-      {/* Grid: Permintaan Peminjaman & Aktivitas Terbaru */}
+      {/* Table Section */}
       <div style={{
-        display: 'grid',
-        gridTemplateColumns: '1.6fr 1fr',
-        gap: '24px',
-        alignItems: 'start'
-      }} className="dashboard-main-grid">
-        {/* Section Permintaan Peminjaman */}
+        marginTop: '12px',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '16px'
+      }}>
+        {/* Table Title and Link */}
+        <div style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center'
+        }}>
+          <h2 style={{
+            fontSize: '18px',
+            fontWeight: 700,
+            color: '#0f172a',
+            margin: 0
+          }}>
+            Menunggu Persetujuan
+          </h2>
+          <a
+            href="/admin/peminjaman"
+            className="lihat-semua-link"
+            style={{
+              fontSize: '14px',
+              fontWeight: 600,
+              color: '#3b82f6',
+              textDecoration: 'none',
+              transition: 'color 0.2s ease'
+            }}
+          >
+            Lihat Semua
+          </a>
+        </div>
+
+        {/* Table Card */}
         <div style={{
           backgroundColor: '#ffffff',
-          borderRadius: '16px',
           border: '1px solid #e2e8f0',
-          padding: '24px',
-          boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.02), 0 1px 2px 0 rgba(0, 0, 0, 0.06)'
+          borderRadius: '12px',
+          overflow: 'hidden',
+          boxShadow: '0 1px 3px rgba(0, 0, 0, 0.02)'
         }}>
-          <h3 style={{ margin: '0 0 16px 0', fontSize: '16px', fontWeight: 700, color: '#0f172a' }}>Permintaan Peminjaman</h3>
           <div style={{ overflowX: 'auto' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+            <table style={{
+              width: '100%',
+              borderCollapse: 'collapse',
+              textAlign: 'left'
+            }}>
               <thead>
-                <tr style={{ borderBottom: '1px solid #e2e8f0' }}>
-                  <th style={{ padding: '12px 16px', color: '#64748b', fontSize: '12px', fontWeight: 600 }}>MAHASISWA</th>
-                  <th style={{ padding: '12px 16px', color: '#64748b', fontSize: '12px', fontWeight: 600 }}>JUDUL BUKU</th>
-                  <th style={{ padding: '12px 16px', color: '#64748b', fontSize: '12px', fontWeight: 600 }}>TANGGAL</th>
-                  <th style={{ padding: '12px 16px', color: '#64748b', fontSize: '12px', fontWeight: 600 }}>STATUS</th>
+                <tr style={{
+                  borderBottom: '1px solid #e2e8f0',
+                  backgroundColor: '#fafafb'
+                }}>
+                  <th style={{
+                    padding: '16px 24px',
+                    color: '#0f172a',
+                    fontSize: '14px',
+                    fontWeight: 700
+                  }}>
+                    Mahasiswa
+                  </th>
+                  <th style={{
+                    padding: '16px 24px',
+                    color: '#0f172a',
+                    fontSize: '14px',
+                    fontWeight: 700
+                  }}>
+                    Buku yang Dipinjam
+                  </th>
+                  <th style={{
+                    padding: '16px 24px',
+                    color: '#0f172a',
+                    fontSize: '14px',
+                    fontWeight: 700
+                  }}>
+                    Status Permintaan
+                  </th>
                 </tr>
               </thead>
               <tbody>
-                {requests.map((req, idx) => (
-                  <tr key={idx} style={{ borderBottom: idx !== requests.length - 1 ? '1px solid #f1f5f9' : 'none' }}>
-                    <td style={{ padding: '14px 16px', fontWeight: 600, fontSize: '13px', color: '#0f172a' }}>{req.name}</td>
-                    <td style={{ padding: '14px 16px', fontSize: '13px', color: '#334155' }}>{req.book}</td>
-                    <td style={{ padding: '14px 16px', color: '#64748b', fontSize: '13px' }}>{req.date}</td>
-                    <td style={{ padding: '14px 16px' }}>
+                {approvalRequests.map((req, index) => (
+                  <tr
+                    key={index}
+                    style={{
+                      borderBottom: index !== approvalRequests.length - 1 ? '1px solid #e2e8f0' : 'none'
+                    }}
+                  >
+                    {/* Mahasiswa Column */}
+                    <td style={{ padding: '16px 24px' }}>
+                      <div style={{
+                        fontSize: '14px',
+                        fontWeight: 700,
+                        color: '#0f172a'
+                      }}>
+                        {req.name}
+                      </div>
+                      <div style={{
+                        fontSize: '12px',
+                        color: '#64748b',
+                        marginTop: '2px'
+                      }}>
+                        NIM: {req.nim}
+                      </div>
+                    </td>
+
+                    {/* Buku Column */}
+                    <td style={{
+                      padding: '16px 24px',
+                      fontSize: '14px',
+                      fontWeight: 500,
+                      color: '#334155'
+                    }}>
+                      {req.book}
+                    </td>
+
+                    {/* Status Column */}
+                    <td style={{ padding: '16px 24px' }}>
                       <span style={{
-                        backgroundColor: req.badgeBg,
-                        color: req.badgeColor,
-                        padding: '4px 10px',
-                        borderRadius: '9999px',
-                        fontSize: '11px',
-                        fontWeight: 600,
-                        whiteSpace: 'nowrap'
-                      }}>{req.status}</span>
+                        backgroundColor: '#ffedd5',
+                        color: '#ea580c',
+                        padding: '6px 16px',
+                        borderRadius: '12px',
+                        fontSize: '12px',
+                        fontWeight: 700,
+                        display: 'inline-block'
+                      }}>
+                        {req.status}
+                      </span>
                     </td>
                   </tr>
                 ))}
@@ -166,133 +286,21 @@ export default function Dashboard() {
             </table>
           </div>
         </div>
-
-        {/* Section Aktivitas Terbaru */}
-        <div style={{
-          backgroundColor: '#ffffff',
-          borderRadius: '16px',
-          border: '1px solid #e2e8f0',
-          padding: '24px',
-          boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.02), 0 1px 2px 0 rgba(0, 0, 0, 0.06)'
-        }}>
-          <h3 style={{ margin: '0 0 16px 0', fontSize: '16px', fontWeight: 700, color: '#0f172a' }}>Aktivitas Terbaru</h3>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            {activities.map((act, idx) => (
-              <div key={idx} style={{
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '4px',
-                borderLeft: '2px solid #e2e8f0',
-                paddingLeft: '14px',
-                position: 'relative'
-              }}>
-                <div style={{
-                  position: 'absolute',
-                  left: '-5px',
-                  top: '4px',
-                  width: '8px',
-                  height: '8px',
-                  borderRadius: '50%',
-                  backgroundColor: '#2563eb'
-                }}></div>
-                <div style={{ fontSize: '13px', color: '#334155', lineHeight: '1.4' }}>
-                  <strong style={{ color: '#0f172a' }}>{act.user}</strong> {act.desc.replace(act.user, '')}
-                </div>
-                <span style={{ fontSize: '11px', color: '#94a3b8' }}>{act.time}</span>
-              </div>
-            ))}
-          </div>
-        </div>
       </div>
 
-      {/* Section Ringkasan Cepat */}
-      <div>
-        <h3 style={{ margin: '0 0 16px 0', fontSize: '18px', fontWeight: 700, color: '#0f172a' }}>Ringkasan Cepat</h3>
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-          gap: '20px'
-        }}>
-          {/* Card: Buku Terlambat */}
-          <div style={{
-            backgroundColor: '#ffffff',
-            borderRadius: '16px',
-            border: '1px solid #e2e8f0',
-            padding: '20px',
-            boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.02), 0 1px 2px 0 rgba(0, 0, 0, 0.06)'
-          }}>
-            <h4 style={{ margin: '0 0 12px 0', fontSize: '14px', fontWeight: 700, color: '#ef4444', display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <span>⚠️</span> Buku Terlambat
-            </h4>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              {quickOverview.lateBooks.map((item, idx) => (
-                <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <div>
-                    <div style={{ fontSize: '13px', fontWeight: 600, color: '#0f172a' }}>{item.title}</div>
-                    <div style={{ fontSize: '11px', color: '#64748b' }}>{item.user}</div>
-                  </div>
-                  <span style={{ fontSize: '11px', color: '#ef4444', fontWeight: 600, backgroundColor: 'rgba(239, 68, 68, 0.05)', padding: '2px 8px', borderRadius: '4px' }}>
-                    {item.days}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Card: Buku Dipinjam Hari Ini */}
-          <div style={{
-            backgroundColor: '#ffffff',
-            borderRadius: '16px',
-            border: '1px solid #e2e8f0',
-            padding: '20px',
-            boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.02), 0 1px 2px 0 rgba(0, 0, 0, 0.06)'
-          }}>
-            <h4 style={{ margin: '0 0 12px 0', fontSize: '14px', fontWeight: 700, color: '#2563eb', display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <span>📘</span> Dipinjam Hari Ini
-            </h4>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              {quickOverview.borrowedToday.map((item, idx) => (
-                <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <div style={{ fontSize: '13px', fontWeight: 600, color: '#0f172a' }}>{item.title}</div>
-                  <span style={{ fontSize: '11px', color: '#2563eb', fontWeight: 600, backgroundColor: 'rgba(37, 99, 235, 0.05)', padding: '2px 8px', borderRadius: '4px' }}>
-                    {item.category}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Card: Pengguna Aktif */}
-          <div style={{
-            backgroundColor: '#ffffff',
-            borderRadius: '16px',
-            border: '1px solid #e2e8f0',
-            padding: '20px',
-            boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.02), 0 1px 2px 0 rgba(0, 0, 0, 0.06)'
-          }}>
-            <h4 style={{ margin: '0 0 12px 0', fontSize: '14px', fontWeight: 700, color: '#10b981', display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <span>⭐</span> Pengguna Aktif
-            </h4>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              {quickOverview.activeUsers.map((item, idx) => (
-                <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <div style={{ fontSize: '13px', fontWeight: 600, color: '#0f172a' }}>{item.name}</div>
-                  <span style={{ fontSize: '11px', color: '#10b981', fontWeight: 600 }}>{item.info}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Extra Responsive stylesheet inject code */}
+      {/* Style overrides */}
       <style>{`
-        .stat-card-hover:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03) !important;
+        .lihat-semua-link:hover {
+          color: #2563eb !important;
+          text-decoration: underline !important;
         }
         @media (max-width: 1024px) {
-          .dashboard-main-grid {
+          .admin-stats-grid {
+            grid-template-columns: repeat(2, 1fr) !important;
+          }
+        }
+        @media (max-width: 640px) {
+          .admin-stats-grid {
             grid-template-columns: 1fr !important;
           }
         }
