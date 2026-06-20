@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import Swal from 'sweetalert2';
 import '../../styles/student-history.css';
 
 // Import cover images
@@ -6,7 +7,6 @@ import pythonCover from '../../assets/images/python_book_cover.png';
 import mlCover from '../../assets/images/ml_book_cover.png';
 
 export default function History() {
-  const [successNotice, setSuccessNotice] = useState('');
 
   // Dummy Stats matching Figma
   const stats = {
@@ -41,10 +41,25 @@ export default function History() {
   ];
 
   const handleReborrow = (title) => {
-    setSuccessNotice(`Buku "${title}" berhasil diajukan untuk pinjam lagi!`);
-    setTimeout(() => {
-      setSuccessNotice('');
-    }, 3000);
+    Swal.fire({
+      title: 'Pinjam Buku Ini Lagi?',
+      text: `Apakah Anda yakin ingin mengajukan peminjaman kembali untuk buku "${title}"?`,
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonColor: '#2563eb',
+      cancelButtonColor: '#64748b',
+      confirmButtonText: 'Ya, Ajukan!',
+      cancelButtonText: 'Batal'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        Swal.fire({
+          title: 'Berhasil Diajukan!',
+          text: `Permintaan peminjaman buku "${title}" berhasil diajukan.`,
+          icon: 'success',
+          confirmButtonColor: '#10b981'
+        });
+      }
+    });
   };
 
   return (
@@ -99,15 +114,7 @@ export default function History() {
         </div>
       </div>
 
-      {/* Success Notification Alert */}
-      {successNotice && (
-        <div className="renew-success-alert">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-          {successNotice}
-        </div>
-      )}
+
 
       {/* History Cards Stack */}
       <div className="history-stack">

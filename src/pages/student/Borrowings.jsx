@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import Swal from 'sweetalert2';
 import '../../styles/student-borrowings.css';
 
 // Import book cover images
@@ -7,7 +8,6 @@ import mlCover from '../../assets/images/ml_book_cover.png';
 import cCover from '../../assets/images/c_book_cover.png';
 
 export default function Borrowings() {
-  const [renewNotice, setRenewNotice] = useState('');
   const [borrowings, setBorrowings] = useState([
     {
       id: 1,
@@ -48,23 +48,38 @@ export default function Borrowings() {
   ]);
 
   const handleRenew = (id, title) => {
-    setBorrowings(prev =>
-      prev.map(item => {
-        if (item.id === id) {
-          return {
-            ...item,
-            dueDate: '26 April 2026',
-            isRenewed: true
-          };
-        }
-        return item;
-      })
-    );
+    Swal.fire({
+      title: 'Perpanjang Peminjaman?',
+      text: `Apakah Anda yakin ingin memperpanjang masa pinjam buku "${title}"?`,
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonColor: '#10b981',
+      cancelButtonColor: '#64748b',
+      confirmButtonText: 'Ya, Perpanjang!',
+      cancelButtonText: 'Batal'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        setBorrowings(prev =>
+          prev.map(item => {
+            if (item.id === id) {
+              return {
+                ...item,
+                dueDate: '26 April 2026',
+                isRenewed: true
+              };
+            }
+            return item;
+          })
+        );
 
-    setRenewNotice(`Masa pinjam buku "${title}" berhasil diperpanjang!`);
-    setTimeout(() => {
-      setRenewNotice('');
-    }, 3000);
+        Swal.fire({
+          title: 'Berhasil!',
+          text: `Masa pinjam buku "${title}" berhasil diperpanjang.`,
+          icon: 'success',
+          confirmButtonColor: '#10b981'
+        });
+      }
+    });
   };
 
   return (
@@ -77,15 +92,7 @@ export default function Borrowings() {
         </p>
       </div>
 
-      {/* Alert message on renewal success */}
-      {renewNotice && (
-        <div className="renew-success-alert">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-          {renewNotice}
-        </div>
-      )}
+
 
       {/* Borrowing Cards Stack */}
       <div className="borrowings-stack">

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import Swal from 'sweetalert2';
 import '../../styles/student-book-detail.css';
 
 export default function BookDetail() {
@@ -114,6 +115,12 @@ export default function BookDetail() {
     setTimeout(() => {
       setSubmitting(false);
       setBorrowed(true);
+      Swal.fire({
+        title: 'Pengajuan Berhasil!',
+        text: `Permintaan peminjaman buku "${book.title}" telah berhasil diajukan.`,
+        icon: 'success',
+        confirmButtonColor: '#2563eb'
+      });
     }, 800);
   };
 
