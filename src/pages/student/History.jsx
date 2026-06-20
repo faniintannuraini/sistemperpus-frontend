@@ -1,50 +1,133 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import Swal from 'sweetalert2';
+import api from '../../services/api';
 import '../../styles/student-history.css';
 
 // Import cover images
 import pythonCover from '../../assets/images/python_book_cover.png';
 import mlCover from '../../assets/images/ml_book_cover.png';
+import cCover from '../../assets/images/c_book_cover.png';
+import accountingCover from '../../assets/images/accounting_book_cover.png';
+import ekonomiMikroCover from '../../assets/images/ekonomi_mikro_cover.png';
+import manajemenOperasionalCover from '../../assets/images/manajemen_operasional_cover.png';
+import algoritmaPemrogramanCover from '../../assets/images/algoritma_pemrograman_cover.png';
+import pengantarAkuntansiCover from '../../assets/images/pengantar_akuntansi_cover.png';
 
 export default function History() {
-  const [successNotice, setSuccessNotice] = useState('');
+  const [historyList, setHistoryList] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  // Dummy Stats matching Figma
-  const stats = {
-    total: 2,
-    onTime: 1,
-    late: 1
+  useEffect(() => {
+    fetchHistory();
+  }, []);
+
+  const fetchHistory = async () => {
+    try {
+      setLoading(true);
+      const response = await api.get('/peminjaman');
+      if (response.data && response.data.status === 'success') {
+        const hist = response.data.data.filter(
+          item => item.status === 'dikembalikan' || item.status === 'ditolak'
+        );
+        setHistoryList(hist);
+      }
+    } catch (error) {
+      console.error('Error fetching history:', error);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  // Dummy History data matching Figma
-  const historyData = [
-    {
-      id: 1,
-      title: 'Programming',
-      author: 'Abdur Rahman',
-      year: '2022',
-      borrowDate: '02 Mar 2026',
-      returnDate: '09 Mar 2026',
-      status: 'Tepat Waktu',
-      cover: pythonCover
-    },
-    {
-      id: 2,
-      title: 'Programming', // "Machine Learning for Beginners" shown as "Programming" in Figma mockup
-      subtitle: 'Machine Learning for Beginners',
-      author: 'Abdur Rahman',
-      year: '2022',
-      borrowDate: '02 Mar 2026',
-      returnDate: '09 Mar 2026',
-      status: 'Terlambat',
-      cover: mlCover
-    }
-  ];
+  const getReturnStatus = (item) => {
+    if (item.status === 'ditolak') return 'Ditolak';
+    if (!item.tanggal_dikembalikan) return 'Tepat Waktu';
+    const returned = new Date(item.tanggal_dikembalikan);
+    const due = new Date(item.tanggal_kembali);
+    return returned > due ? 'Terlambat' : 'Tepat Waktu';
+  };
 
-  const handleReborrow = (title) => {
-    setSuccessNotice(`Buku "${title}" berhasil diajukan untuk pinjam lagi!`);
-    setTimeout(() => {
-      setSuccessNotice('');
-    }, 3000);
+  const getCoverImage = (title, id) => {
+    const t = (title || '').toLowerCase();
+    if (t.includes('machine') || t.includes('learning') || t.includes('ml')) return mlCover;
+    if (t.includes('expert c') || t.includes(' c ') || t.includes('programming c') || t.startsWith('c ')) return cCover;
+    if (t.includes('ekonomi') || t.includes('mikro')) return ekonomiMikroCover;
+    if (t.includes('akuntansi') && t.includes('keuangan')) return accountingCover;
+    if (t.includes('akuntansi')) return pengantarAkuntansiCover;
+    if (t.includes('manajemen') || t.includes('operasional')) return manajemenOperasionalCover;
+    if (t.includes('algoritma') || t.includes('pemrograman')) return algoritmaPemrogramanCover;
+    
+    const idx = id ? parseInt(id, 10) : 0;
+    const rem = idx % 8;
+    if (rem === 1) return mlCover;
+    if (rem === 2) return cCover;
+    if (rem === 3) return ekonomiMikroCover;
+    if (rem === 4) return accountingCover;
+    if (rem === 5) return manajemenOperasionalCover;
+    if (rem === 6) return algoritmaPemrogramanCover;
+    if (rem === 7) return pengantarAkuntansiCover;
+    return pythonCover;
+  };
+
+  const formatDate = (dateString) => {
+    if (!dateString) return '-';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
+  };
+
+  const stats = {
+    total: historyList.length,
+    onTime: historyList.filter(item => getReturnStatus(item) === 'Tepat Waktu').length,
+    late: historyList.filter(item => getReturnStatus(item) === 'Terlambat').length
+  };
+
+  const handleReborrow = (bookId, title) => {
+    Swal.fire({
+      title: 'Pinjam Buku Ini Lagi?',
+      text: `Apakah Anda yakin ingin mengajukan peminjaman kembali untuk buku "${title}"?`,
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonColor: '#2563eb',
+      cancelButtonColor: '#64748b',
+      confirmButtonText: 'Ya, Ajukan!',
+      cancelButtonText: 'Batal'
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        const today = new Date();
+        const formattedToday = today.toISOString().split('T')[0];
+
+        const nextWeek = new Date();
+        nextWeek.setDate(today.getDate() + 7);
+        const formattedNextWeek = nextWeek.toISOString().split('T')[0];
+
+        const payload = {
+          id_buku: bookId,
+          tanggal_pinjam: formattedToday,
+          tanggal_kembali: formattedNextWeek
+        };
+
+        try {
+          const response = await api.post('/peminjaman', payload);
+          if (response.data && response.data.status === 'success') {
+            Swal.fire({
+              title: 'Berhasil Diajukan!',
+              text: `Permintaan peminjaman buku "${title}" berhasil diajukan.`,
+              icon: 'success',
+              confirmButtonColor: '#10b981'
+            });
+            fetchHistory();
+          }
+        } catch (error) {
+          console.error('Error re-borrowing book:', error);
+          const errorMsg = error.response?.data?.message || 'Gagal mengajukan peminjaman buku.';
+          Swal.fire({
+            title: 'Gagal!',
+            text: errorMsg,
+            icon: 'error',
+            confirmButtonColor: '#ef4444'
+          });
+        }
+      }
+    });
   };
 
   return (
@@ -99,64 +182,67 @@ export default function History() {
         </div>
       </div>
 
-      {/* Success Notification Alert */}
-      {successNotice && (
-        <div className="renew-success-alert">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-          {successNotice}
-        </div>
-      )}
-
       {/* History Cards Stack */}
       <div className="history-stack">
-        {historyData.map((item) => {
-          const isLate = item.status === 'Terlambat';
-          
-          return (
-            <div key={item.id} className="history-card-item">
-              {/* Left Side: Cover & Info */}
-              <div className="card-left-section">
-                {item.cover ? (
-                  <div className="book-cover-wrapper">
-                    <img src={item.cover} alt={item.title} className="book-cover-img" />
-                  </div>
-                ) : (
-                  <div className="book-cover-wrapper-empty"></div>
-                )}
-                
-                <div className="book-info-wrapper">
-                  <h3 className="book-title">
-                    {item.title}
-                    {item.subtitle && <span className="book-subtitle-text"> ({item.subtitle})</span>}
-                  </h3>
-                  <p className="book-author">{item.author}</p>
-                  <p className="book-year">{item.year}</p>
+        {loading ? (
+          <h3 style={{ textAlign: 'center', color: '#64748b', padding: '20px' }}>Memuat data riwayat...</h3>
+        ) : historyList.length === 0 ? (
+          <div style={{ textAlign: 'center', color: '#64748b', padding: '40px', backgroundColor: '#fff', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
+            <h3>Tidak ada riwayat peminjaman</h3>
+            <p>Anda belum pernah meminjam dan mengembalikan buku.</p>
+          </div>
+        ) : (
+          historyList.map((item) => {
+            const retStatus = getReturnStatus(item);
+            const isLate = retStatus === 'Terlambat';
+            const isDitolak = retStatus === 'Ditolak';
 
-                  <div className="borrow-details-list">
-                    <p className="detail-item">Pinjam: {item.borrowDate}</p>
-                    <p className="detail-item">Kembali: {item.returnDate}</p>
+            return (
+              <div key={item.id_transaksi} className="history-card-item">
+                {/* Left Side: Cover & Info */}
+                <div className="card-left-section">
+                  <div className="book-cover-wrapper">
+                    <img 
+                      src={getCoverImage(item.book?.judul, item.id_buku)} 
+                      alt={item.book?.judul || 'Cover'} 
+                      className="book-cover-img" 
+                    />
+                  </div>
+                  
+                  <div className="book-info-wrapper">
+                    <h3 className="book-title">
+                      {item.book?.judul || 'Buku'}
+                    </h3>
+                    <p className="book-author">{item.book?.pengarang || '-'}</p>
+                    <p className="book-year">{item.book?.tahun_terbit || '-'}</p>
+
+                    <div className="borrow-details-list">
+                      <p className="detail-item">Pinjam: {formatDate(item.tanggal_pinjam)}</p>
+                      <p className="detail-item">Kembali: {formatDate(item.tanggal_kembali)}</p>
+                      {item.tanggal_dikembalikan && (
+                        <p className="detail-item" style={{ color: '#10b981', fontWeight: 600 }}>Dikembalikan: {formatDate(item.tanggal_dikembalikan)}</p>
+                      )}
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              {/* Right Side: Status Badge & Pinjam Lagi Button */}
-              <div className="card-right-section">
-                <span className={`status-badge-custom ${isLate ? 'badge-red-history' : 'badge-green-history'}`}>
-                  {item.status}
-                </span>
+                {/* Right Side: Status Badge & Pinjam Lagi Button */}
+                <div className="card-right-section">
+                  <span className={`status-badge-custom ${isDitolak ? 'badge-red-history' : isLate ? 'badge-red-history' : 'badge-green-history'}`}>
+                    {retStatus}
+                  </span>
 
-                <button
-                  className="pinjam-lagi-btn-custom"
-                  onClick={() => handleReborrow(item.title)}
-                >
-                  Pinjam Lagi
-                </button>
+                  <button
+                    className="pinjam-lagi-btn-custom"
+                    onClick={() => handleReborrow(item.id_buku, item.book?.judul)}
+                  >
+                    Pinjam Lagi
+                  </button>
+                </div>
               </div>
-            </div>
-          );
-        })}
+            );
+          })
+        )}
       </div>
     </div>
   );

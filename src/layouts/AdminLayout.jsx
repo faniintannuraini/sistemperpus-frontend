@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import Swal from 'sweetalert2';
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
+import api from '../services/api';
 import '../styles/admin-layout.css';
 
 export default function AdminLayout() {
@@ -24,7 +26,27 @@ export default function AdminLayout() {
   }, []);
 
   const handleLogout = () => {
-    navigate('/login');
+    Swal.fire({
+      title: 'Keluar Akun',
+      text: 'Apakah Anda yakin ingin keluar dari panel admin?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#ef4444',
+      cancelButtonColor: '#64748b',
+      confirmButtonText: 'Ya, Keluar!',
+      cancelButtonText: 'Batal'
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          await api.post('/logout');
+        } catch (err) {
+          console.error('Logout error:', err);
+        }
+        localStorage.removeItem('token');
+        localStorage.removeItem('role');
+        navigate('/login');
+      }
+    });
   };
 
   const handleMenuClick = () => {

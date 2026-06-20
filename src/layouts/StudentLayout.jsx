@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import Swal from 'sweetalert2';
 import { Outlet, NavLink, useLocation, useNavigate } from 'react-router-dom';
+import api from '../services/api';
 import '../styles/student-layout.css';
 
 export default function StudentLayout() {
@@ -23,7 +25,27 @@ export default function StudentLayout() {
   }, []);
 
   const handleLogout = () => {
-    navigate('/login');
+    Swal.fire({
+      title: 'Keluar Akun',
+      text: 'Apakah Anda yakin ingin keluar dari akun Anda?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#ef4444',
+      cancelButtonColor: '#64748b',
+      confirmButtonText: 'Ya, Keluar!',
+      cancelButtonText: 'Batal'
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          await api.post('/logout');
+        } catch (err) {
+          console.error('Logout error:', err);
+        }
+        localStorage.removeItem('token');
+        localStorage.removeItem('role');
+        navigate('/login');
+      }
+    });
   };
 
   const handleMenuClick = () => {

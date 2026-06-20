@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import Swal from 'sweetalert2';
 
 export default function Fines() {
   const [activeTab, setActiveTab] = useState('menunggu');
@@ -17,7 +18,12 @@ export default function Fines() {
 
   // Handlers
   const handlePayment = (fine) => {
-    alert(`Pembayaran denda ${fine.id} sebesar ${fine.total} untuk ${fine.student} berhasil dikonfirmasi.`);
+    Swal.fire({
+      title: 'Pembayaran Berhasil',
+      text: `Pembayaran denda ${fine.id} sebesar ${fine.total} untuk ${fine.student} berhasil dikonfirmasi.`,
+      icon: 'success',
+      confirmButtonColor: '#10b981'
+    });
     // Move to history
     const paidFine = {
       id: fine.id,

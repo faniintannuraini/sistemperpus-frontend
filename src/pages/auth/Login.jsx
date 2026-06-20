@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import api from '../../services/api';
 import '../../styles/login.css';
 
 export default function Login() {
@@ -9,17 +10,31 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-    console.log('Login attempt:', { email, password });
 
-    if (email.includes('admin')) {
-      navigate('/admin/dashboard');
-    } else if (email.includes('student')) {
-      navigate('/student/dashboard');
-    } else {
-      setError('Email atau password tidak sesuai.');
+    try {
+      const response = await api.post('/login', { email, password });
+      if (response.data.status === 'success') {
+        const { token, user } = response.data.data;
+        localStorage.setItem('token', token);
+        localStorage.setItem('role', user.role);
+        
+        if (user.role === 'admin') {
+          navigate('/admin/dashboard');
+        } else {
+          navigate('/student/dashboard');
+        }
+      } else {
+        setError(response.data.message || 'Login gagal.');
+      }
+    } catch (err) {
+      if (err.response && err.response.data && err.response.data.message) {
+        setError(err.response.data.message);
+      } else {
+        setError('Gagal terhubung ke server backend.');
+      }
     }
   };
 

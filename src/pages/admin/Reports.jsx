@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import Swal from 'sweetalert2';
 
 export default function Reports() {
   const [activeTab, setActiveTab] = useState('peminjaman');
@@ -6,11 +7,41 @@ export default function Reports() {
 
   // Mock Export Handlers
   const handleExportPDF = () => {
-    alert('Mengekspor laporan ke format PDF...');
+    Swal.fire({
+      title: 'Mengekspor PDF...',
+      text: 'Mohon tunggu sebentar, sistem sedang menyiapkan laporan PDF.',
+      allowOutsideClick: false,
+      didOpen: () => {
+        Swal.showLoading();
+        setTimeout(() => {
+          Swal.fire({
+            title: 'Ekspor Berhasil!',
+            text: 'Laporan telah berhasil diekspor ke format PDF.',
+            icon: 'success',
+            confirmButtonColor: '#ef4444'
+          });
+        }, 1500);
+      }
+    });
   };
 
   const handleExportExcel = () => {
-    alert('Mengekspor laporan ke format Excel (.xlsx)...');
+    Swal.fire({
+      title: 'Mengekspor Excel...',
+      text: 'Mohon tunggu sebentar, sistem sedang menyiapkan berkas Excel.',
+      allowOutsideClick: false,
+      didOpen: () => {
+        Swal.showLoading();
+        setTimeout(() => {
+          Swal.fire({
+            title: 'Ekspor Berhasil!',
+            text: 'Laporan telah berhasil diekspor ke format Excel (.xlsx).',
+            icon: 'success',
+            confirmButtonColor: '#10b981'
+          });
+        }, 1500);
+      }
+    });
   };
 
   // Dummy Data for Tab 1: Laporan Peminjaman

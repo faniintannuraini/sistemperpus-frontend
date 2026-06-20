@@ -1,44 +1,196 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import Swal from 'sweetalert2';
+import api from '../../services/api';
 
 export default function Users() {
-  const departments = [
-    'Semua Program Studi',
-    'Teknik Informatika',
-    'Sistem Informasi',
-    'Teknik Sipil'
-  ];
-
-  const initialUsers = [
-    { id: 1, name: 'Azizah Nur Rahma', nim: '2201010', prodi: 'Teknik Informatika', email: 'azizah@student.unper.ac.id', status: 'Aktif' },
-    { id: 2, name: 'Hesti Wahyuni', nim: '2201011', prodi: 'Teknik Informatika', email: 'hesti@student.unper.ac.id', status: 'Aktif' },
-    { id: 3, name: 'Fani Intan Nuraini', nim: '2201012', prodi: 'Teknik Informatika', email: 'fani@student.unper.ac.id', status: 'Aktif' },
-    { id: 4, name: 'Maurine Fladya A', nim: '2201013', prodi: 'Teknik Informatika', email: 'mauri@student.unper.ac.id', status: 'Aktif' },
-    { id: 5, name: 'Euis Samsiah', nim: '2201014', prodi: 'Teknik Informatika', email: 'euis@student.unper.ac.id', status: 'Aktif' },
-    { id: 6, name: 'Esti Hartati', nim: '2201015', prodi: 'Teknik Informatika', email: 'esti@student.unper.ac.id', status: 'Aktif' },
-    { id: 7, name: 'Irzha Wiardi P', nim: '2201016', prodi: 'Teknik Informatika', email: 'irzha@student.unper.ac.id', status: 'Aktif' }
-  ];
-
-  const [users, setUsers] = useState(initialUsers);
+  const [users, setUsers] = useState([]);
+  const [prodis, setProdis] = useState([]);
   const [selectedProdi, setSelectedProdi] = useState('Semua Program Studi');
+
+  // Modal States
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalMode, setModalMode] = useState('add'); // 'add' | 'edit'
+  const [formData, setFormData] = useState({
+    id_user: '',
+    nama: '',
+    nim: '',
+    id_prodi: '',
+    email: '',
+    password: ''
+  });
+
+  useEffect(() => {
+    fetchUsers();
+    fetchProdis();
+  }, []);
+
+  const fetchUsers = async () => {
+    try {
+      const response = await api.get('/admin/user');
+      if (response.data && response.data.status === 'success') {
+        setUsers(response.data.data);
+      }
+    } catch (error) {
+      console.error('Error fetching users:', error);
+      Swal.fire({
+        title: 'Error!',
+        text: 'Gagal memuat data mahasiswa.',
+        icon: 'error',
+        confirmButtonColor: '#ef4444'
+      });
+    }
+  };
+
+  const fetchProdis = async () => {
+    try {
+      const response = await api.get('/program-studi');
+      if (response.data && response.data.status === 'success') {
+        setProdis(response.data.data);
+      }
+    } catch (error) {
+      console.error('Error fetching program studi:', error);
+    }
+  };
 
   // Action Handlers
   const handleAddUser = () => {
-    alert('Aksi Tambah Mahasiswa dipicu (Modal form tambah mahasiswa baru akan muncul).');
+    setModalMode('add');
+    setFormData({
+      id_user: '',
+      nama: '',
+      nim: '',
+      id_prodi: prodis[0]?.id_prodi || '',
+      email: '',
+      password: ''
+    });
+    setIsModalOpen(true);
   };
 
   const handleEdit = (user) => {
-    alert(`Edit Data Mahasiswa: "${user.name}" (Modal form edit data mahasiswa akan muncul).`);
+    const foundProdi = prodis.find(p => p.nama_prodi === user.nama_prodi);
+    setModalMode('edit');
+    setFormData({
+      id_user: user.id_user,
+      nama: user.nama,
+      nim: user.nim,
+      id_prodi: foundProdi ? foundProdi.id_prodi : (prodis[0]?.id_prodi || ''),
+      email: user.email,
+      password: ''
+    });
+    setIsModalOpen(true);
   };
 
   const handleHapus = (userId) => {
-    if (confirm('Apakah Anda yakin ingin menghapus mahasiswa ini dari database?')) {
-      setUsers(users.filter(u => u.id !== userId));
+    Swal.fire({
+      title: 'Hapus Mahasiswa',
+      text: 'Apakah Anda yakin ingin menghapus mahasiswa ini dari database?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#ef4444',
+      cancelButtonColor: '#64748b',
+      confirmButtonText: 'Ya, Hapus!',
+      cancelButtonText: 'Batal'
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          const response = await api.delete(`/admin/user/${userId}`);
+          if (response.data && response.data.status === 'success') {
+            Swal.fire({
+              title: 'Terhapus!',
+              text: 'Data mahasiswa berhasil dihapus.',
+              icon: 'success',
+              confirmButtonColor: '#10b981'
+            });
+            fetchUsers();
+          }
+        } catch (error) {
+          console.error('Error deleting user:', error);
+          const errorMsg = error.response?.data?.message || 'Gagal menghapus data mahasiswa.';
+          Swal.fire({
+            title: 'Gagal!',
+            text: errorMsg,
+            icon: 'error',
+            confirmButtonColor: '#ef4444'
+          });
+        }
+      }
+    });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!formData.nama.trim() || !formData.nim.trim() || !formData.email.trim() || !formData.id_prodi) {
+      Swal.fire({
+        title: 'Formulir Belum Lengkap',
+        text: 'Harap isi nama, NIM, email, dan program studi mahasiswa.',
+        icon: 'warning',
+        confirmButtonColor: '#ea580c'
+      });
+      return;
+    }
+
+    if (modalMode === 'add' && (!formData.password || formData.password.length < 6)) {
+      Swal.fire({
+        title: 'Formulir Belum Lengkap',
+        text: 'Password minimal 6 karakter wajib diisi untuk mahasiswa baru.',
+        icon: 'warning',
+        confirmButtonColor: '#ea580c'
+      });
+      return;
+    }
+
+    const payload = {
+      nama: formData.nama,
+      nim: formData.nim,
+      email: formData.email,
+      id_prodi: parseInt(formData.id_prodi, 10)
+    };
+
+    if (formData.password) {
+      payload.password = formData.password;
+    }
+
+    try {
+      if (modalMode === 'add') {
+        const response = await api.post('/admin/user', payload);
+        if (response.data && response.data.status === 'success') {
+          Swal.fire({
+            title: 'Berhasil!',
+            text: 'Data mahasiswa baru berhasil ditambahkan.',
+            icon: 'success',
+            confirmButtonColor: '#10b981'
+          });
+          fetchUsers();
+          setIsModalOpen(false);
+        }
+      } else {
+        const response = await api.put(`/admin/user/${formData.id_user}`, payload);
+        if (response.data && response.data.status === 'success') {
+          Swal.fire({
+            title: 'Berhasil!',
+            text: 'Data mahasiswa berhasil diperbarui.',
+            icon: 'success',
+            confirmButtonColor: '#10b981'
+          });
+          fetchUsers();
+          setIsModalOpen(false);
+        }
+      }
+    } catch (error) {
+      console.error('Error saving user:', error);
+      const errorMsg = error.response?.data?.message || 'Gagal menyimpan data mahasiswa.';
+      Swal.fire({
+        title: 'Gagal!',
+        text: errorMsg,
+        icon: 'error',
+        confirmButtonColor: '#ef4444'
+      });
     }
   };
 
   // Filter Logic
   const filteredUsers = users.filter(user => {
-    return selectedProdi === 'Semua Program Studi' || user.prodi === selectedProdi;
+    return selectedProdi === 'Semua Program Studi' || user.nama_prodi === selectedProdi;
   });
 
   return (
@@ -68,7 +220,7 @@ export default function Users() {
           fontSize: '14px',
           color: '#64748b'
         }}>
-          Manajemen data anggota perpustakaan (mahasiswa dan dosen).
+          Manajemen data anggota perpustakaan (mahasiswa).
         </p>
       </div>
 
@@ -96,8 +248,9 @@ export default function Users() {
             minWidth: '200px'
           }}
         >
-          {departments.map((dep, index) => (
-            <option key={index} value={dep}>{dep}</option>
+          <option value="Semua Program Studi">Semua Program Studi</option>
+          {prodis.map((p) => (
+            <option key={p.id_prodi} value={p.nama_prodi}>{p.nama_prodi}</option>
           ))}
         </select>
 
@@ -157,14 +310,14 @@ export default function Users() {
               <tbody>
                 {filteredUsers.map((user, index) => (
                   <tr
-                    key={user.id}
+                    key={user.id_user}
                     style={{
                       borderBottom: index !== filteredUsers.length - 1 ? '1px solid #e2e8f0' : 'none'
                     }}
                   >
                     {/* Student Data Column (Name & NIM) */}
                     <td style={{ padding: '16px 24px' }}>
-                      <div style={{ fontWeight: 700, fontSize: '14px', color: '#0f172a' }}>{user.name}</div>
+                      <div style={{ fontWeight: 700, fontSize: '14px', color: '#0f172a' }}>{user.nama}</div>
                       <div style={{ fontSize: '12px', color: '#64748b', marginTop: '2px' }}>NIM: {user.nim}</div>
                     </td>
 
@@ -175,7 +328,7 @@ export default function Users() {
                       fontWeight: 700,
                       color: '#334155'
                     }}>
-                      {user.prodi}
+                      {user.nama_prodi || 'Umum'}
                     </td>
 
                     {/* Email Column */}
@@ -199,7 +352,7 @@ export default function Users() {
                         fontWeight: 700,
                         display: 'inline-block'
                       }}>
-                        {user.status}
+                        Aktif
                       </span>
                     </td>
 
@@ -233,7 +386,7 @@ export default function Users() {
 
                         {/* Hapus Button */}
                         <button
-                          onClick={() => handleHapus(user.id)}
+                          onClick={() => handleHapus(user.id_user)}
                           title="Hapus Mahasiswa"
                           style={{
                             width: '32px',
@@ -275,8 +428,271 @@ export default function Users() {
         )}
       </div>
 
+      {/* Modal Dialog */}
+      {isModalOpen && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(15, 23, 42, 0.4)',
+          backdropFilter: 'blur(4px)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 9999,
+          padding: '16px',
+          boxSizing: 'border-box'
+        }}>
+          <div
+            className="modal-scrollable"
+            style={{
+              backgroundColor: '#ffffff',
+              borderRadius: '16px',
+              width: '100%',
+              maxWidth: '500px',
+              maxHeight: '90vh',
+              overflowY: 'auto',
+              boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+              animation: 'modalSlideUp 0.3s ease-out'
+            }}
+          >
+            {/* Modal Header */}
+            <div style={{
+              padding: '20px 24px',
+              borderBottom: '1px solid #f1f5f9',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between'
+            }}>
+              <h2 style={{
+                margin: 0,
+                fontSize: '18px',
+                fontWeight: 700,
+                color: '#0f172a'
+              }}>
+                {modalMode === 'add' ? 'Tambah Mahasiswa Baru' : 'Edit Data Mahasiswa'}
+              </h2>
+              <button
+                type="button"
+                onClick={() => setIsModalOpen(false)}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: '#94a3b8',
+                  cursor: 'pointer',
+                  padding: '4px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}
+              >
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ width: '20px', height: '20px' }}>
+                  <line x1="18" y1="6" x2="6" y2="18" />
+                  <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <form onSubmit={handleSubmit} style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              {/* Nama Input */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                <label style={{ fontSize: '13px', fontWeight: 600, color: '#475569' }}>Nama Lengkap</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="Contoh: Fani Intan Nuraini"
+                  value={formData.nama}
+                  onChange={(e) => setFormData({ ...formData, nama: e.target.value })}
+                  style={{
+                    padding: '10px 14px',
+                    fontSize: '14px',
+                    borderRadius: '8px',
+                    border: '1px solid #cbd5e1',
+                    outline: 'none',
+                    transition: 'border-color 0.2s'
+                  }}
+                  className="modal-input"
+                />
+              </div>
+
+              {/* NIM Input */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                <label style={{ fontSize: '13px', fontWeight: 600, color: '#475569' }}>NIM</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="Contoh: 2201012"
+                  value={formData.nim}
+                  onChange={(e) => setFormData({ ...formData, nim: e.target.value })}
+                  style={{
+                    padding: '10px 14px',
+                    fontSize: '14px',
+                    borderRadius: '8px',
+                    border: '1px solid #cbd5e1',
+                    outline: 'none',
+                    transition: 'border-color 0.2s'
+                  }}
+                  className="modal-input"
+                />
+              </div>
+
+              {/* Program Studi Select */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                <label style={{ fontSize: '13px', fontWeight: 600, color: '#475569' }}>Program Studi</label>
+                <select
+                  value={formData.id_prodi}
+                  onChange={(e) => setFormData({ ...formData, id_prodi: e.target.value })}
+                  style={{
+                    padding: '10px 14px',
+                    fontSize: '14px',
+                    borderRadius: '8px',
+                    border: '1px solid #cbd5e1',
+                    backgroundColor: '#ffffff',
+                    outline: 'none',
+                    cursor: 'pointer'
+                  }}
+                >
+                  <option value="" disabled>Pilih Program Studi</option>
+                  {prodis.map((p) => (
+                    <option key={p.id_prodi} value={p.id_prodi}>
+                      {p.nama_prodi}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Email Input */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                <label style={{ fontSize: '13px', fontWeight: 600, color: '#475569' }}>Email</label>
+                <input
+                  type="email"
+                  required
+                  placeholder="Contoh: fani@student.unper.ac.id"
+                  value={formData.email}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  style={{
+                    padding: '10px 14px',
+                    fontSize: '14px',
+                    borderRadius: '8px',
+                    border: '1px solid #cbd5e1',
+                    outline: 'none',
+                    transition: 'border-color 0.2s'
+                  }}
+                  className="modal-input"
+                />
+              </div>
+
+              {/* Password Input */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                <label style={{ fontSize: '13px', fontWeight: 600, color: '#475569' }}>
+                  Password {modalMode === 'edit' && '(Kosongkan jika tidak ingin mengubah)'}
+                </label>
+                <input
+                  type="password"
+                  required={modalMode === 'add'}
+                  placeholder={modalMode === 'add' ? "Minimal 6 karakter" : "Masukkan password baru"}
+                  value={formData.password}
+                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                  style={{
+                    padding: '10px 14px',
+                    fontSize: '14px',
+                    borderRadius: '8px',
+                    border: '1px solid #cbd5e1',
+                    outline: 'none',
+                    transition: 'border-color 0.2s'
+                  }}
+                  className="modal-input"
+                />
+              </div>
+
+              {/* Modal Footer Actions */}
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'flex-end',
+                gap: '12px',
+                marginTop: '12px',
+                borderTop: '1px solid #f1f5f9',
+                paddingTop: '20px'
+              }}>
+                <button
+                  type="button"
+                  onClick={() => setIsModalOpen(false)}
+                  style={{
+                    padding: '10px 18px',
+                    fontSize: '14px',
+                    fontWeight: 600,
+                    borderRadius: '8px',
+                    border: '1px solid #cbd5e1',
+                    backgroundColor: '#ffffff',
+                    color: '#475569',
+                    cursor: 'pointer',
+                    transition: 'background-color 0.2s'
+                  }}
+                  className="modal-cancel-btn"
+                >
+                  Batal
+                </button>
+                <button
+                  type="submit"
+                  style={{
+                    padding: '10px 18px',
+                    fontSize: '14px',
+                    fontWeight: 600,
+                    borderRadius: '8px',
+                    border: 'none',
+                    backgroundColor: modalMode === 'add' ? '#10b981' : '#3b82f6',
+                    color: '#ffffff',
+                    cursor: 'pointer',
+                    transition: 'background-color 0.2s'
+                  }}
+                  className="modal-submit-btn"
+                >
+                  Simpan
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
       {/* Style overrides */}
       <style>{`
+        .modal-scrollable::-webkit-scrollbar {
+          width: 6px;
+        }
+        .modal-scrollable::-webkit-scrollbar-track {
+          background: transparent;
+        }
+        .modal-scrollable::-webkit-scrollbar-thumb {
+          background: #cbd5e1;
+          border-radius: 10px;
+        }
+        .modal-scrollable::-webkit-scrollbar-thumb:hover {
+          background: #94a3b8;
+        }
+        @keyframes modalSlideUp {
+          from {
+            transform: translateY(20px);
+            opacity: 0;
+          }
+          to {
+            transform: translateY(0);
+            opacity: 1;
+          }
+        }
+        .modal-input:focus {
+          border-color: #3b82f6 !important;
+        }
+        .modal-cancel-btn:hover {
+          background-color: #f8fafc !important;
+        }
+        .modal-submit-btn:hover {
+          opacity: 0.9 !important;
+        }
         .admin-add-btn-user:hover {
           background-color: #059669 !important;
         }

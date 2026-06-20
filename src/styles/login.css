@@ -273,3 +273,9 @@
     max-width: 100%;
   }
 }
+
+/* Hide default browser password reveal buttons (Edge, IE, etc.) */
+input::-ms-reveal,
+input::-ms-clear {
+  display: none;
+}
