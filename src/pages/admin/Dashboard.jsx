@@ -1,10 +1,35 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import api from '../../services/api';
 
 export default function Dashboard() {
+  const [statsData, setStatsData] = useState({
+    total_buku: 0,
+    total_mahasiswa: 0,
+    buku_sedang_dipinjam: 0,
+    user_belum_bayar_denda: 0
+  });
+  const [approvalRequests, setApprovalRequests] = useState([]);
+
+  useEffect(() => {
+    fetchDashboardData();
+  }, []);
+
+  const fetchDashboardData = async () => {
+    try {
+      const response = await api.get('/dashboard/admin');
+      if (response.data && response.data.status === 'success') {
+        setStatsData(response.data.data.stat_cards);
+        setApprovalRequests(response.data.data.menunggu_persetujuan);
+      }
+    } catch (error) {
+      console.error('Error fetching dashboard data:', error);
+    }
+  };
+
   const stats = [
     {
       title: 'Total Buku',
-      count: '1459 Buku',
+      count: `${statsData.total_buku} Buku`,
       icon: (
         <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ width: '24px', height: '24px' }}>
           <path d="M19 3H5C3.9 3 3 3.9 3 5V19C3 20.1 3.9 21 5 21H19C20.1 21 21 20.1 21 19V5C21 3.9 20.1 3 19 3ZM16 17H8V15H16V17ZM16 13H8V11H16V13ZM16 9H8V7H16V9Z" fill="#2563eb"/>
@@ -14,7 +39,7 @@ export default function Dashboard() {
     },
     {
       title: 'Total User (Mahasiswa)',
-      count: '892 Buku', // Matching Figma mockup typo exactly
+      count: `${statsData.total_mahasiswa} Mahasiswa`,
       icon: (
         <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ width: '24px', height: '24px' }}>
           <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5s-3 1.34-3 3 1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5 5 6.34 5 8s1.34 3 3 3zm0 2.02c-2.33 0-7 1.17-7 3.5V19h14v-2.48c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.43V19h6v-2.48c0-2.33-4.67-3.5-7-3.5z" fill="#10b981"/>
@@ -24,7 +49,7 @@ export default function Dashboard() {
     },
     {
       title: 'Buku Sedang Dipinjam',
-      count: '128 Buku',
+      count: `${statsData.buku_sedang_dipinjam} Buku`,
       icon: (
         <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ width: '24px', height: '24px' }}>
           <path d="M5 4v2h14V4H5zm0 10h4v6H5v-6zm10 0h4v6h-4v-6zm-5-5h4v11h-4V9z" fill="#a855f7"/>
@@ -34,34 +59,13 @@ export default function Dashboard() {
     },
     {
       title: 'Denda Belum Dibayar',
-      count: '14 User',
+      count: `${statsData.user_belum_bayar_denda} User`,
       icon: (
         <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ width: '24px', height: '24px' }}>
           <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM13 17H11V15H13V17ZM13 13H11V7H13V13Z" fill="#ef4444"/>
         </svg>
       ),
       bg: '#fee2e2'
-    }
-  ];
-
-  const approvalRequests = [
-    {
-      name: 'Azizah Nur Rahma',
-      nim: '2201010',
-      book: 'Python Programming',
-      status: 'Menunggu Diambil'
-    },
-    {
-      name: 'Hesti Wahyuni',
-      nim: '2201011',
-      book: 'Machine Learning',
-      status: 'Menunggu Diambil'
-    },
-    {
-      name: 'Fani Intan Nuraini',
-      nim: '2201012',
-      book: 'Expert C Programming',
-      status: 'Menunggu Diambil'
     }
   ];
 
@@ -231,57 +235,66 @@ export default function Dashboard() {
                 </tr>
               </thead>
               <tbody>
-                {approvalRequests.map((req, index) => (
-                  <tr
-                    key={index}
-                    style={{
-                      borderBottom: index !== approvalRequests.length - 1 ? '1px solid #e2e8f0' : 'none'
-                    }}
-                  >
-                    {/* Mahasiswa Column */}
-                    <td style={{ padding: '16px 24px' }}>
-                      <div style={{
-                        fontSize: '14px',
-                        fontWeight: 700,
-                        color: '#0f172a'
-                      }}>
-                        {req.name}
-                      </div>
-                      <div style={{
-                        fontSize: '12px',
-                        color: '#64748b',
-                        marginTop: '2px'
-                      }}>
-                        NIM: {req.nim}
-                      </div>
-                    </td>
-
-                    {/* Buku Column */}
-                    <td style={{
-                      padding: '16px 24px',
-                      fontSize: '14px',
-                      fontWeight: 500,
-                      color: '#334155'
-                    }}>
-                      {req.book}
-                    </td>
-
-                    {/* Status Column */}
-                    <td style={{ padding: '16px 24px' }}>
-                      <span style={{
-                        backgroundColor: '#ffedd5',
-                        color: '#ea580c',
-                        padding: '6px 16px',
-                        borderRadius: '12px',
-                        fontSize: '12px',
-                        fontWeight: 700,
-                        display: 'inline-block'
-                      }}>
-                        {req.status}
-                      </span>
+                {approvalRequests.length === 0 ? (
+                  <tr>
+                    <td colSpan="3" style={{ padding: '24px', textAlign: 'center', color: '#64748b', fontSize: '14px' }}>
+                      Tidak ada permintaan peminjaman yang menunggu persetujuan.
                     </td>
                   </tr>
-                ))}
+                ) : (
+                  approvalRequests.map((req, index) => (
+                    <tr
+                      key={req.id_transaksi || index}
+                      style={{
+                        borderBottom: index !== approvalRequests.length - 1 ? '1px solid #e2e8f0' : 'none'
+                      }}
+                    >
+                      {/* Mahasiswa Column */}
+                      <td style={{ padding: '16px 24px' }}>
+                        <div style={{
+                          fontSize: '14px',
+                          fontWeight: 700,
+                          color: '#0f172a'
+                        }}>
+                          {req.nama}
+                        </div>
+                        <div style={{
+                          fontSize: '12px',
+                          color: '#64748b',
+                          marginTop: '2px'
+                        }}>
+                          NIM: {req.nim}
+                        </div>
+                      </td>
+
+                      {/* Buku Column */}
+                      <td style={{
+                        padding: '16px 24px',
+                        fontSize: '14px',
+                        fontWeight: 500,
+                        color: '#334155'
+                      }}>
+                        {req.book_title}
+                      </td>
+
+                      {/* Status Column */}
+                      <td style={{ padding: '16px 24px' }}>
+                        <span style={{
+                          backgroundColor: '#ffedd5',
+                          color: '#ea580c',
+                          padding: '6px 16px',
+                          borderRadius: '12px',
+                          fontSize: '12px',
+                          fontWeight: 700,
+                          display: 'inline-block',
+                          textTransform: 'capitalize'
+                        }}>
+                          {req.status === 'menunggu' ? 'Menunggu Persetujuan' : req.status}
+                        </span>
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>

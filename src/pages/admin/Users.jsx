@@ -1,56 +1,82 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Swal from 'sweetalert2';
+import api from '../../services/api';
 
 export default function Users() {
-  const departments = [
-    'Semua Program Studi',
-    'Teknik Informatika',
-    'Sistem Informasi',
-    'Teknik Sipil'
-  ];
-
-  const initialUsers = [
-    { id: 1, name: 'Azizah Nur Rahma', nim: '2201010', prodi: 'Teknik Informatika', email: 'azizah@student.unper.ac.id', status: 'Aktif' },
-    { id: 2, name: 'Hesti Wahyuni', nim: '2201011', prodi: 'Teknik Informatika', email: 'hesti@student.unper.ac.id', status: 'Aktif' },
-    { id: 3, name: 'Fani Intan Nuraini', nim: '2201012', prodi: 'Teknik Informatika', email: 'fani@student.unper.ac.id', status: 'Aktif' },
-    { id: 4, name: 'Maurine Fladya A', nim: '2201013', prodi: 'Teknik Informatika', email: 'mauri@student.unper.ac.id', status: 'Aktif' },
-    { id: 5, name: 'Euis Samsiah', nim: '2201014', prodi: 'Teknik Informatika', email: 'euis@student.unper.ac.id', status: 'Aktif' },
-    { id: 6, name: 'Esti Hartati', nim: '2201015', prodi: 'Teknik Informatika', email: 'esti@student.unper.ac.id', status: 'Aktif' },
-    { id: 7, name: 'Irzha Wiardi P', nim: '2201016', prodi: 'Teknik Informatika', email: 'irzha@student.unper.ac.id', status: 'Aktif' }
-  ];
-
-  const [users, setUsers] = useState(initialUsers);
+  const [users, setUsers] = useState([]);
+  const [prodis, setProdis] = useState([]);
   const [selectedProdi, setSelectedProdi] = useState('Semua Program Studi');
 
   // Modal States
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState('add'); // 'add' | 'edit'
   const [formData, setFormData] = useState({
-    id: '',
-    name: '',
+    id_user: '',
+    nama: '',
     nim: '',
-    prodi: 'Teknik Informatika',
+    id_prodi: '',
     email: '',
-    status: 'Aktif'
+    password: ''
   });
+
+  useEffect(() => {
+    fetchUsers();
+    fetchProdis();
+  }, []);
+
+  const fetchUsers = async () => {
+    try {
+      const response = await api.get('/admin/user');
+      if (response.data && response.data.status === 'success') {
+        setUsers(response.data.data);
+      }
+    } catch (error) {
+      console.error('Error fetching users:', error);
+      Swal.fire({
+        title: 'Error!',
+        text: 'Gagal memuat data mahasiswa.',
+        icon: 'error',
+        confirmButtonColor: '#ef4444'
+      });
+    }
+  };
+
+  const fetchProdis = async () => {
+    try {
+      const response = await api.get('/program-studi');
+      if (response.data && response.data.status === 'success') {
+        setProdis(response.data.data);
+      }
+    } catch (error) {
+      console.error('Error fetching program studi:', error);
+    }
+  };
 
   // Action Handlers
   const handleAddUser = () => {
     setModalMode('add');
     setFormData({
-      id: '',
-      name: '',
+      id_user: '',
+      nama: '',
       nim: '',
-      prodi: 'Teknik Informatika',
+      id_prodi: prodis[0]?.id_prodi || '',
       email: '',
-      status: 'Aktif'
+      password: ''
     });
     setIsModalOpen(true);
   };
 
   const handleEdit = (user) => {
+    const foundProdi = prodis.find(p => p.nama_prodi === user.nama_prodi);
     setModalMode('edit');
-    setFormData({ ...user });
+    setFormData({
+      id_user: user.id_user,
+      nama: user.nama,
+      nim: user.nim,
+      id_prodi: foundProdi ? foundProdi.id_prodi : (prodis[0]?.id_prodi || ''),
+      email: user.email,
+      password: ''
+    });
     setIsModalOpen(true);
   };
 
@@ -64,58 +90,107 @@ export default function Users() {
       cancelButtonColor: '#64748b',
       confirmButtonText: 'Ya, Hapus!',
       cancelButtonText: 'Batal'
-    }).then((result) => {
+    }).then(async (result) => {
       if (result.isConfirmed) {
-        setUsers(users.filter(u => u.id !== userId));
-        Swal.fire({
-          title: 'Terhapus!',
-          text: 'Data mahasiswa berhasil dihapus.',
-          icon: 'success',
-          confirmButtonColor: '#10b981'
-        });
+        try {
+          const response = await api.delete(`/admin/user/${userId}`);
+          if (response.data && response.data.status === 'success') {
+            Swal.fire({
+              title: 'Terhapus!',
+              text: 'Data mahasiswa berhasil dihapus.',
+              icon: 'success',
+              confirmButtonColor: '#10b981'
+            });
+            fetchUsers();
+          }
+        } catch (error) {
+          console.error('Error deleting user:', error);
+          const errorMsg = error.response?.data?.message || 'Gagal menghapus data mahasiswa.';
+          Swal.fire({
+            title: 'Gagal!',
+            text: errorMsg,
+            icon: 'error',
+            confirmButtonColor: '#ef4444'
+          });
+        }
       }
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!formData.name.trim() || !formData.nim.trim() || !formData.email.trim()) {
+    if (!formData.nama.trim() || !formData.nim.trim() || !formData.email.trim() || !formData.id_prodi) {
       Swal.fire({
         title: 'Formulir Belum Lengkap',
-        text: 'Harap isi nama, NIM, dan email mahasiswa.',
+        text: 'Harap isi nama, NIM, email, dan program studi mahasiswa.',
         icon: 'warning',
         confirmButtonColor: '#ea580c'
       });
       return;
     }
 
-    if (modalMode === 'add') {
-      const newUser = {
-        ...formData,
-        id: users.length > 0 ? Math.max(...users.map(u => u.id)) + 1 : 1
-      };
-      setUsers([...users, newUser]);
+    if (modalMode === 'add' && (!formData.password || formData.password.length < 6)) {
       Swal.fire({
-        title: 'Berhasil!',
-        text: 'Data mahasiswa baru berhasil ditambahkan.',
-        icon: 'success',
-        confirmButtonColor: '#10b981'
+        title: 'Formulir Belum Lengkap',
+        text: 'Password minimal 6 karakter wajib diisi untuk mahasiswa baru.',
+        icon: 'warning',
+        confirmButtonColor: '#ea580c'
       });
-    } else {
-      setUsers(users.map(u => u.id === formData.id ? formData : u));
+      return;
+    }
+
+    const payload = {
+      nama: formData.nama,
+      nim: formData.nim,
+      email: formData.email,
+      id_prodi: parseInt(formData.id_prodi, 10)
+    };
+
+    if (formData.password) {
+      payload.password = formData.password;
+    }
+
+    try {
+      if (modalMode === 'add') {
+        const response = await api.post('/admin/user', payload);
+        if (response.data && response.data.status === 'success') {
+          Swal.fire({
+            title: 'Berhasil!',
+            text: 'Data mahasiswa baru berhasil ditambahkan.',
+            icon: 'success',
+            confirmButtonColor: '#10b981'
+          });
+          fetchUsers();
+          setIsModalOpen(false);
+        }
+      } else {
+        const response = await api.put(`/admin/user/${formData.id_user}`, payload);
+        if (response.data && response.data.status === 'success') {
+          Swal.fire({
+            title: 'Berhasil!',
+            text: 'Data mahasiswa berhasil diperbarui.',
+            icon: 'success',
+            confirmButtonColor: '#10b981'
+          });
+          fetchUsers();
+          setIsModalOpen(false);
+        }
+      }
+    } catch (error) {
+      console.error('Error saving user:', error);
+      const errorMsg = error.response?.data?.message || 'Gagal menyimpan data mahasiswa.';
       Swal.fire({
-        title: 'Berhasil!',
-        text: 'Data mahasiswa berhasil diperbarui.',
-        icon: 'success',
-        confirmButtonColor: '#10b981'
+        title: 'Gagal!',
+        text: errorMsg,
+        icon: 'error',
+        confirmButtonColor: '#ef4444'
       });
     }
-    setIsModalOpen(false);
   };
 
   // Filter Logic
   const filteredUsers = users.filter(user => {
-    return selectedProdi === 'Semua Program Studi' || user.prodi === selectedProdi;
+    return selectedProdi === 'Semua Program Studi' || user.nama_prodi === selectedProdi;
   });
 
   return (
@@ -145,7 +220,7 @@ export default function Users() {
           fontSize: '14px',
           color: '#64748b'
         }}>
-          Manajemen data anggota perpustakaan (mahasiswa dan dosen).
+          Manajemen data anggota perpustakaan (mahasiswa).
         </p>
       </div>
 
@@ -173,8 +248,9 @@ export default function Users() {
             minWidth: '200px'
           }}
         >
-          {departments.map((dep, index) => (
-            <option key={index} value={dep}>{dep}</option>
+          <option value="Semua Program Studi">Semua Program Studi</option>
+          {prodis.map((p) => (
+            <option key={p.id_prodi} value={p.nama_prodi}>{p.nama_prodi}</option>
           ))}
         </select>
 
@@ -234,14 +310,14 @@ export default function Users() {
               <tbody>
                 {filteredUsers.map((user, index) => (
                   <tr
-                    key={user.id}
+                    key={user.id_user}
                     style={{
                       borderBottom: index !== filteredUsers.length - 1 ? '1px solid #e2e8f0' : 'none'
                     }}
                   >
                     {/* Student Data Column (Name & NIM) */}
                     <td style={{ padding: '16px 24px' }}>
-                      <div style={{ fontWeight: 700, fontSize: '14px', color: '#0f172a' }}>{user.name}</div>
+                      <div style={{ fontWeight: 700, fontSize: '14px', color: '#0f172a' }}>{user.nama}</div>
                       <div style={{ fontSize: '12px', color: '#64748b', marginTop: '2px' }}>NIM: {user.nim}</div>
                     </td>
 
@@ -252,7 +328,7 @@ export default function Users() {
                       fontWeight: 700,
                       color: '#334155'
                     }}>
-                      {user.prodi}
+                      {user.nama_prodi || 'Umum'}
                     </td>
 
                     {/* Email Column */}
@@ -276,7 +352,7 @@ export default function Users() {
                         fontWeight: 700,
                         display: 'inline-block'
                       }}>
-                        {user.status}
+                        Aktif
                       </span>
                     </td>
 
@@ -310,7 +386,7 @@ export default function Users() {
 
                         {/* Hapus Button */}
                         <button
-                          onClick={() => handleHapus(user.id)}
+                          onClick={() => handleHapus(user.id_user)}
                           title="Hapus Mahasiswa"
                           style={{
                             width: '32px',
@@ -428,8 +504,8 @@ export default function Users() {
                   type="text"
                   required
                   placeholder="Contoh: Fani Intan Nuraini"
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  value={formData.nama}
+                  onChange={(e) => setFormData({ ...formData, nama: e.target.value })}
                   style={{
                     padding: '10px 14px',
                     fontSize: '14px',
@@ -467,8 +543,8 @@ export default function Users() {
               <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
                 <label style={{ fontSize: '13px', fontWeight: 600, color: '#475569' }}>Program Studi</label>
                 <select
-                  value={formData.prodi}
-                  onChange={(e) => setFormData({ ...formData, prodi: e.target.value })}
+                  value={formData.id_prodi}
+                  onChange={(e) => setFormData({ ...formData, id_prodi: e.target.value })}
                   style={{
                     padding: '10px 14px',
                     fontSize: '14px',
@@ -479,9 +555,12 @@ export default function Users() {
                     cursor: 'pointer'
                   }}
                 >
-                  <option value="Teknik Informatika">Teknik Informatika</option>
-                  <option value="Sistem Informasi">Sistem Informasi</option>
-                  <option value="Teknik Sipil">Teknik Sipil</option>
+                  <option value="" disabled>Pilih Program Studi</option>
+                  {prodis.map((p) => (
+                    <option key={p.id_prodi} value={p.id_prodi}>
+                      {p.nama_prodi}
+                    </option>
+                  ))}
                 </select>
               </div>
 
@@ -506,25 +585,27 @@ export default function Users() {
                 />
               </div>
 
-              {/* Status Select */}
+              {/* Password Input */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                <label style={{ fontSize: '13px', fontWeight: 600, color: '#475569' }}>Status</label>
-                <select
-                  value={formData.status}
-                  onChange={(e) => setFormData({ ...formData, status: e.target.value })}
+                <label style={{ fontSize: '13px', fontWeight: 600, color: '#475569' }}>
+                  Password {modalMode === 'edit' && '(Kosongkan jika tidak ingin mengubah)'}
+                </label>
+                <input
+                  type="password"
+                  required={modalMode === 'add'}
+                  placeholder={modalMode === 'add' ? "Minimal 6 karakter" : "Masukkan password baru"}
+                  value={formData.password}
+                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                   style={{
                     padding: '10px 14px',
                     fontSize: '14px',
                     borderRadius: '8px',
                     border: '1px solid #cbd5e1',
-                    backgroundColor: '#ffffff',
                     outline: 'none',
-                    cursor: 'pointer'
+                    transition: 'border-color 0.2s'
                   }}
-                >
-                  <option value="Aktif">Aktif</option>
-                  <option value="Nonaktif">Nonaktif</option>
-                </select>
+                  className="modal-input"
+                />
               </div>
 
               {/* Modal Footer Actions */}
