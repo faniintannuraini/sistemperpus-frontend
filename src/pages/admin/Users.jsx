@@ -22,23 +22,36 @@ export default function Users() {
   const [users, setUsers] = useState(initialUsers);
   const [selectedProdi, setSelectedProdi] = useState('Semua Program Studi');
 
+  // Modal States
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalMode, setModalMode] = useState('add'); // 'add' | 'edit'
+  const [formData, setFormData] = useState({
+    id: '',
+    name: '',
+    nim: '',
+    prodi: 'Teknik Informatika',
+    email: '',
+    status: 'Aktif'
+  });
+
   // Action Handlers
   const handleAddUser = () => {
-    Swal.fire({
-      title: 'Tambah Mahasiswa',
-      text: 'Aksi Tambah Mahasiswa dipicu (Modal form tambah mahasiswa baru akan muncul).',
-      icon: 'info',
-      confirmButtonColor: '#10b981'
+    setModalMode('add');
+    setFormData({
+      id: '',
+      name: '',
+      nim: '',
+      prodi: 'Teknik Informatika',
+      email: '',
+      status: 'Aktif'
     });
+    setIsModalOpen(true);
   };
 
   const handleEdit = (user) => {
-    Swal.fire({
-      title: 'Edit Mahasiswa',
-      text: `Edit Data Mahasiswa: "${user.name}" (Modal form edit data mahasiswa akan muncul).`,
-      icon: 'info',
-      confirmButtonColor: '#3b82f6'
-    });
+    setModalMode('edit');
+    setFormData({ ...user });
+    setIsModalOpen(true);
   };
 
   const handleHapus = (userId) => {
@@ -62,6 +75,42 @@ export default function Users() {
         });
       }
     });
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (!formData.name.trim() || !formData.nim.trim() || !formData.email.trim()) {
+      Swal.fire({
+        title: 'Formulir Belum Lengkap',
+        text: 'Harap isi nama, NIM, dan email mahasiswa.',
+        icon: 'warning',
+        confirmButtonColor: '#ea580c'
+      });
+      return;
+    }
+
+    if (modalMode === 'add') {
+      const newUser = {
+        ...formData,
+        id: users.length > 0 ? Math.max(...users.map(u => u.id)) + 1 : 1
+      };
+      setUsers([...users, newUser]);
+      Swal.fire({
+        title: 'Berhasil!',
+        text: 'Data mahasiswa baru berhasil ditambahkan.',
+        icon: 'success',
+        confirmButtonColor: '#10b981'
+      });
+    } else {
+      setUsers(users.map(u => u.id === formData.id ? formData : u));
+      Swal.fire({
+        title: 'Berhasil!',
+        text: 'Data mahasiswa berhasil diperbarui.',
+        icon: 'success',
+        confirmButtonColor: '#10b981'
+      });
+    }
+    setIsModalOpen(false);
   };
 
   // Filter Logic
@@ -303,8 +352,266 @@ export default function Users() {
         )}
       </div>
 
+      {/* Modal Dialog */}
+      {isModalOpen && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(15, 23, 42, 0.4)',
+          backdropFilter: 'blur(4px)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 9999,
+          padding: '16px',
+          boxSizing: 'border-box'
+        }}>
+          <div
+            className="modal-scrollable"
+            style={{
+              backgroundColor: '#ffffff',
+              borderRadius: '16px',
+              width: '100%',
+              maxWidth: '500px',
+              maxHeight: '90vh',
+              overflowY: 'auto',
+              boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+              animation: 'modalSlideUp 0.3s ease-out'
+            }}
+          >
+            {/* Modal Header */}
+            <div style={{
+              padding: '20px 24px',
+              borderBottom: '1px solid #f1f5f9',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between'
+            }}>
+              <h2 style={{
+                margin: 0,
+                fontSize: '18px',
+                fontWeight: 700,
+                color: '#0f172a'
+              }}>
+                {modalMode === 'add' ? 'Tambah Mahasiswa Baru' : 'Edit Data Mahasiswa'}
+              </h2>
+              <button
+                type="button"
+                onClick={() => setIsModalOpen(false)}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: '#94a3b8',
+                  cursor: 'pointer',
+                  padding: '4px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}
+              >
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ width: '20px', height: '20px' }}>
+                  <line x1="18" y1="6" x2="6" y2="18" />
+                  <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <form onSubmit={handleSubmit} style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              {/* Nama Input */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                <label style={{ fontSize: '13px', fontWeight: 600, color: '#475569' }}>Nama Lengkap</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="Contoh: Fani Intan Nuraini"
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  style={{
+                    padding: '10px 14px',
+                    fontSize: '14px',
+                    borderRadius: '8px',
+                    border: '1px solid #cbd5e1',
+                    outline: 'none',
+                    transition: 'border-color 0.2s'
+                  }}
+                  className="modal-input"
+                />
+              </div>
+
+              {/* NIM Input */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                <label style={{ fontSize: '13px', fontWeight: 600, color: '#475569' }}>NIM</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="Contoh: 2201012"
+                  value={formData.nim}
+                  onChange={(e) => setFormData({ ...formData, nim: e.target.value })}
+                  style={{
+                    padding: '10px 14px',
+                    fontSize: '14px',
+                    borderRadius: '8px',
+                    border: '1px solid #cbd5e1',
+                    outline: 'none',
+                    transition: 'border-color 0.2s'
+                  }}
+                  className="modal-input"
+                />
+              </div>
+
+              {/* Program Studi Select */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                <label style={{ fontSize: '13px', fontWeight: 600, color: '#475569' }}>Program Studi</label>
+                <select
+                  value={formData.prodi}
+                  onChange={(e) => setFormData({ ...formData, prodi: e.target.value })}
+                  style={{
+                    padding: '10px 14px',
+                    fontSize: '14px',
+                    borderRadius: '8px',
+                    border: '1px solid #cbd5e1',
+                    backgroundColor: '#ffffff',
+                    outline: 'none',
+                    cursor: 'pointer'
+                  }}
+                >
+                  <option value="Teknik Informatika">Teknik Informatika</option>
+                  <option value="Sistem Informasi">Sistem Informasi</option>
+                  <option value="Teknik Sipil">Teknik Sipil</option>
+                </select>
+              </div>
+
+              {/* Email Input */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                <label style={{ fontSize: '13px', fontWeight: 600, color: '#475569' }}>Email</label>
+                <input
+                  type="email"
+                  required
+                  placeholder="Contoh: fani@student.unper.ac.id"
+                  value={formData.email}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  style={{
+                    padding: '10px 14px',
+                    fontSize: '14px',
+                    borderRadius: '8px',
+                    border: '1px solid #cbd5e1',
+                    outline: 'none',
+                    transition: 'border-color 0.2s'
+                  }}
+                  className="modal-input"
+                />
+              </div>
+
+              {/* Status Select */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                <label style={{ fontSize: '13px', fontWeight: 600, color: '#475569' }}>Status</label>
+                <select
+                  value={formData.status}
+                  onChange={(e) => setFormData({ ...formData, status: e.target.value })}
+                  style={{
+                    padding: '10px 14px',
+                    fontSize: '14px',
+                    borderRadius: '8px',
+                    border: '1px solid #cbd5e1',
+                    backgroundColor: '#ffffff',
+                    outline: 'none',
+                    cursor: 'pointer'
+                  }}
+                >
+                  <option value="Aktif">Aktif</option>
+                  <option value="Nonaktif">Nonaktif</option>
+                </select>
+              </div>
+
+              {/* Modal Footer Actions */}
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'flex-end',
+                gap: '12px',
+                marginTop: '12px',
+                borderTop: '1px solid #f1f5f9',
+                paddingTop: '20px'
+              }}>
+                <button
+                  type="button"
+                  onClick={() => setIsModalOpen(false)}
+                  style={{
+                    padding: '10px 18px',
+                    fontSize: '14px',
+                    fontWeight: 600,
+                    borderRadius: '8px',
+                    border: '1px solid #cbd5e1',
+                    backgroundColor: '#ffffff',
+                    color: '#475569',
+                    cursor: 'pointer',
+                    transition: 'background-color 0.2s'
+                  }}
+                  className="modal-cancel-btn"
+                >
+                  Batal
+                </button>
+                <button
+                  type="submit"
+                  style={{
+                    padding: '10px 18px',
+                    fontSize: '14px',
+                    fontWeight: 600,
+                    borderRadius: '8px',
+                    border: 'none',
+                    backgroundColor: modalMode === 'add' ? '#10b981' : '#3b82f6',
+                    color: '#ffffff',
+                    cursor: 'pointer',
+                    transition: 'background-color 0.2s'
+                  }}
+                  className="modal-submit-btn"
+                >
+                  Simpan
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
       {/* Style overrides */}
       <style>{`
+        .modal-scrollable::-webkit-scrollbar {
+          width: 6px;
+        }
+        .modal-scrollable::-webkit-scrollbar-track {
+          background: transparent;
+        }
+        .modal-scrollable::-webkit-scrollbar-thumb {
+          background: #cbd5e1;
+          border-radius: 10px;
+        }
+        .modal-scrollable::-webkit-scrollbar-thumb:hover {
+          background: #94a3b8;
+        }
+        @keyframes modalSlideUp {
+          from {
+            transform: translateY(20px);
+            opacity: 0;
+          }
+          to {
+            transform: translateY(0);
+            opacity: 1;
+          }
+        }
+        .modal-input:focus {
+          border-color: #3b82f6 !important;
+        }
+        .modal-cancel-btn:hover {
+          background-color: #f8fafc !important;
+        }
+        .modal-submit-btn:hover {
+          opacity: 0.9 !important;
+        }
         .admin-add-btn-user:hover {
           background-color: #059669 !important;
         }

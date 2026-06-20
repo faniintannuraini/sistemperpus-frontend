@@ -42,22 +42,52 @@ export default function Books() {
 
   const [selectedProdi, setSelectedProdi] = useState('Semua Program Studi');
 
+  // Modal States
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalMode, setModalMode] = useState('add'); // 'add' | 'edit'
+  const [formData, setFormData] = useState({
+    id: '',
+    title: '',
+    author: '',
+    isbn: '',
+    category: 'Informatika',
+    stock: '15 Exemplar',
+    location: 'Rak-IT 104',
+    coverType: 'python'
+  });
+
+  const getCoverImage = (type) => {
+    if (type === 'ml') return mlCover;
+    if (type === 'c') return cCover;
+    return pythonCover;
+  };
+
   const handleAddBook = () => {
-    Swal.fire({
-      title: 'Tambah Buku',
-      text: 'Aksi Tambahkan Buku dipicu (Modal form tambah buku akan muncul).',
-      icon: 'info',
-      confirmButtonColor: '#3b82f6'
+    setModalMode('add');
+    setFormData({
+      id: '',
+      title: '',
+      author: '',
+      isbn: '',
+      category: 'Informatika',
+      stock: '15 Exemplar',
+      location: 'Rak-IT 104',
+      coverType: 'python'
     });
+    setIsModalOpen(true);
   };
 
   const handleEdit = (book) => {
-    Swal.fire({
-      title: 'Edit Buku',
-      text: `Edit Buku: "${book.title}" (Modal form edit buku akan muncul).`,
-      icon: 'info',
-      confirmButtonColor: '#3b82f6'
+    setModalMode('edit');
+    let coverType = 'python';
+    if (book.cover === mlCover) coverType = 'ml';
+    else if (book.cover === cCover) coverType = 'c';
+
+    setFormData({
+      ...book,
+      coverType
     });
+    setIsModalOpen(true);
   };
 
   const handleHapus = (bookId) => {
@@ -81,6 +111,48 @@ export default function Books() {
         });
       }
     });
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (!formData.title.trim() || !formData.author.trim() || !formData.isbn.trim()) {
+      Swal.fire({
+        title: 'Formulir Belum Lengkap',
+        text: 'Harap isi judul buku, penulis, dan ISBN.',
+        icon: 'warning',
+        confirmButtonColor: '#ea580c'
+      });
+      return;
+    }
+
+    const updatedBook = {
+      ...formData,
+      cover: getCoverImage(formData.coverType)
+    };
+    delete updatedBook.coverType;
+
+    if (modalMode === 'add') {
+      const newBook = {
+        ...updatedBook,
+        id: books.length > 0 ? Math.max(...books.map(b => b.id)) + 1 : 1
+      };
+      setBooks([...books, newBook]);
+      Swal.fire({
+        title: 'Berhasil!',
+        text: 'Buku baru berhasil ditambahkan.',
+        icon: 'success',
+        confirmButtonColor: '#10b981'
+      });
+    } else {
+      setBooks(books.map(b => b.id === formData.id ? updatedBook : b));
+      Swal.fire({
+        title: 'Berhasil!',
+        text: 'Data buku berhasil diperbarui.',
+        icon: 'success',
+        confirmButtonColor: '#10b981'
+      });
+    }
+    setIsModalOpen(false);
   };
 
   return (
@@ -356,8 +428,314 @@ export default function Books() {
         </div>
       </div>
 
+      {/* Modal Dialog */}
+      {isModalOpen && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(15, 23, 42, 0.4)',
+          backdropFilter: 'blur(4px)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 9999,
+          padding: '16px',
+          boxSizing: 'border-box'
+        }}>
+          <div
+            className="modal-scrollable"
+            style={{
+              backgroundColor: '#ffffff',
+              borderRadius: '16px',
+              width: '100%',
+              maxWidth: '500px',
+              maxHeight: '90vh',
+              overflowY: 'auto',
+              boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+              animation: 'modalSlideUp 0.3s ease-out'
+            }}
+          >
+            {/* Modal Header */}
+            <div style={{
+              padding: '20px 24px',
+              borderBottom: '1px solid #f1f5f9',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between'
+            }}>
+              <h2 style={{
+                margin: 0,
+                fontSize: '18px',
+                fontWeight: 700,
+                color: '#0f172a'
+              }}>
+                {modalMode === 'add' ? 'Tambahkan Buku Baru' : 'Edit Detail Buku'}
+              </h2>
+              <button
+                type="button"
+                onClick={() => setIsModalOpen(false)}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: '#94a3b8',
+                  cursor: 'pointer',
+                  padding: '4px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}
+              >
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ width: '20px', height: '20px' }}>
+                  <line x1="18" y1="6" x2="6" y2="18" />
+                  <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <form onSubmit={handleSubmit} style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              {/* Judul Buku Input */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                <label style={{ fontSize: '13px', fontWeight: 600, color: '#475569' }}>Judul Buku</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="Contoh: Python Programming"
+                  value={formData.title}
+                  onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                  style={{
+                    padding: '10px 14px',
+                    fontSize: '14px',
+                    borderRadius: '8px',
+                    border: '1px solid #cbd5e1',
+                    outline: 'none',
+                    transition: 'border-color 0.2s'
+                  }}
+                  className="modal-input"
+                />
+              </div>
+
+              {/* Penulis Input */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                <label style={{ fontSize: '13px', fontWeight: 600, color: '#475569' }}>Penulis</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="Contoh: Martin Evans"
+                  value={formData.author}
+                  onChange={(e) => setFormData({ ...formData, author: e.target.value })}
+                  style={{
+                    padding: '10px 14px',
+                    fontSize: '14px',
+                    borderRadius: '8px',
+                    border: '1px solid #cbd5e1',
+                    outline: 'none',
+                    transition: 'border-color 0.2s'
+                  }}
+                  className="modal-input"
+                />
+              </div>
+
+              {/* ISBN Input */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                <label style={{ fontSize: '13px', fontWeight: 600, color: '#475569' }}>ISBN</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="Contoh: 997-655-111"
+                  value={formData.isbn}
+                  onChange={(e) => setFormData({ ...formData, isbn: e.target.value })}
+                  style={{
+                    padding: '10px 14px',
+                    fontSize: '14px',
+                    borderRadius: '8px',
+                    border: '1px solid #cbd5e1',
+                    outline: 'none',
+                    transition: 'border-color 0.2s'
+                  }}
+                  className="modal-input"
+                />
+              </div>
+
+              {/* Kategori Select */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                <label style={{ fontSize: '13px', fontWeight: 600, color: '#475569' }}>Kategori</label>
+                <select
+                  value={formData.category}
+                  onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                  style={{
+                    padding: '10px 14px',
+                    fontSize: '14px',
+                    borderRadius: '8px',
+                    border: '1px solid #cbd5e1',
+                    backgroundColor: '#ffffff',
+                    outline: 'none',
+                    cursor: 'pointer'
+                  }}
+                >
+                  <option value="Informatika">Informatika</option>
+                  <option value="Sistem Informasi">Sistem Informasi</option>
+                  <option value="Teknik Sipil">Teknik Sipil</option>
+                </select>
+              </div>
+
+              {/* Stok Input */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                <label style={{ fontSize: '13px', fontWeight: 600, color: '#475569' }}>Stok Tersedia</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="Contoh: 15 Exemplar"
+                  value={formData.stock}
+                  onChange={(e) => setFormData({ ...formData, stock: e.target.value })}
+                  style={{
+                    padding: '10px 14px',
+                    fontSize: '14px',
+                    borderRadius: '8px',
+                    border: '1px solid #cbd5e1',
+                    outline: 'none',
+                    transition: 'border-color 0.2s'
+                  }}
+                  className="modal-input"
+                />
+              </div>
+
+              {/* Lokasi Rak Select */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                <label style={{ fontSize: '13px', fontWeight: 600, color: '#475569' }}>Lokasi Rak</label>
+                <select
+                  value={formData.location}
+                  onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+                  style={{
+                    padding: '10px 14px',
+                    fontSize: '14px',
+                    borderRadius: '8px',
+                    border: '1px solid #cbd5e1',
+                    backgroundColor: '#ffffff',
+                    outline: 'none',
+                    cursor: 'pointer'
+                  }}
+                >
+                  <option value="Rak-IT 101">Rak-IT 101</option>
+                  <option value="Rak-IT 102">Rak-IT 102</option>
+                  <option value="Rak-IT 103">Rak-IT 103</option>
+                  <option value="Rak-IT 104">Rak-IT 104</option>
+                  <option value="Rak-IT 105">Rak-IT 105</option>
+                  <option value="Rak-Umum 201">Rak-Umum 201</option>
+                  <option value="Rak-Umum 202">Rak-Umum 202</option>
+                </select>
+              </div>
+
+              {/* Pilih Cover Select */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                <label style={{ fontSize: '13px', fontWeight: 600, color: '#475569' }}>Pilih Visual Cover Buku</label>
+                <select
+                  value={formData.coverType}
+                  onChange={(e) => setFormData({ ...formData, coverType: e.target.value })}
+                  style={{
+                    padding: '10px 14px',
+                    fontSize: '14px',
+                    borderRadius: '8px',
+                    border: '1px solid #cbd5e1',
+                    backgroundColor: '#ffffff',
+                    outline: 'none',
+                    cursor: 'pointer'
+                  }}
+                >
+                  <option value="python">Python Programming Cover</option>
+                  <option value="ml">Machine Learning Cover</option>
+                  <option value="c">Expert C Programming Cover</option>
+                </select>
+              </div>
+
+              {/* Modal Footer Actions */}
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'flex-end',
+                gap: '12px',
+                marginTop: '12px',
+                borderTop: '1px solid #f1f5f9',
+                paddingTop: '20px'
+              }}>
+                <button
+                  type="button"
+                  onClick={() => setIsModalOpen(false)}
+                  style={{
+                    padding: '10px 18px',
+                    fontSize: '14px',
+                    fontWeight: 600,
+                    borderRadius: '8px',
+                    border: '1px solid #cbd5e1',
+                    backgroundColor: '#ffffff',
+                    color: '#475569',
+                    cursor: 'pointer',
+                    transition: 'background-color 0.2s'
+                  }}
+                  className="modal-cancel-btn"
+                >
+                  Batal
+                </button>
+                <button
+                  type="submit"
+                  style={{
+                    padding: '10px 18px',
+                    fontSize: '14px',
+                    fontWeight: 600,
+                    borderRadius: '8px',
+                    border: 'none',
+                    backgroundColor: modalMode === 'add' ? '#3b82f6' : '#f97316',
+                    color: '#ffffff',
+                    cursor: 'pointer',
+                    transition: 'background-color 0.2s'
+                  }}
+                  className="modal-submit-btn"
+                >
+                  Simpan
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
       {/* Style overrides */}
       <style>{`
+        .modal-scrollable::-webkit-scrollbar {
+          width: 6px;
+        }
+        .modal-scrollable::-webkit-scrollbar-track {
+          background: transparent;
+        }
+        .modal-scrollable::-webkit-scrollbar-thumb {
+          background: #cbd5e1;
+          border-radius: 10px;
+        }
+        .modal-scrollable::-webkit-scrollbar-thumb:hover {
+          background: #94a3b8;
+        }
+        @keyframes modalSlideUp {
+          from {
+            transform: translateY(20px);
+            opacity: 0;
+          }
+          to {
+            transform: translateY(0);
+            opacity: 1;
+          }
+        }
+        .modal-input:focus {
+          border-color: #3b82f6 !important;
+        }
+        .modal-cancel-btn:hover {
+          background-color: #f8fafc !important;
+        }
+        .modal-submit-btn:hover {
+          opacity: 0.9 !important;
+        }
         .admin-add-btn:hover {
           background-color: #2563eb !important;
         }
