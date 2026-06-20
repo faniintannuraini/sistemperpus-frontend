@@ -7,9 +7,11 @@ import '../styles/admin-layout.css';
 export default function AdminLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(true); // Default open on desktop
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+  const [profile, setProfile] = useState({ nama: 'Administrator', role: 'admin' });
   const navigate = useNavigate();
 
   useEffect(() => {
+    fetchProfile();
     const handleResize = () => {
       const mobile = window.innerWidth <= 768;
       setIsMobile(mobile);
@@ -24,6 +26,17 @@ export default function AdminLayout() {
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
+
+  const fetchProfile = async () => {
+    try {
+      const response = await api.get('/user/profil');
+      if (response.data && response.data.data) {
+        setProfile(response.data.data);
+      }
+    } catch (error) {
+      console.error('Error fetching admin profile:', error);
+    }
+  };
 
   const handleLogout = () => {
     Swal.fire({
@@ -212,10 +225,10 @@ export default function AdminLayout() {
             {/* Admin Profile Display */}
             <div className="admin-profile-info">
               <div className="admin-details">
-                <span className="admin-name">Administrator</span>
-                <span className="admin-role">Super Admin</span>
+                <span className="admin-name">{profile.nama || 'Administrator'}</span>
+                <span className="admin-role">{profile.role === 'admin' ? 'Petugas Perpustakaan' : 'Super Admin'}</span>
               </div>
-              <div className="admin-avatar">AD</div>
+              <div className="admin-avatar">{profile.nama ? profile.nama.slice(0, 2).toUpperCase() : 'AD'}</div>
             </div>
           </div>
         </nav>

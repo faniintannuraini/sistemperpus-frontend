@@ -1,42 +1,68 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Swal from 'sweetalert2';
+import api from '../../services/api';
 
 export default function Fines() {
   const [activeTab, setActiveTab] = useState('menunggu');
+  const [fines, setFines] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  // Dummy Data for Tab 1: Menunggu Pembayaran
-  const [pendingFines, setPendingFines] = useState([
-    { id: 'PRX-8815', student: 'Maurine Fladya', nim: '2303010055', days: '5 Hari', total: 'Rp. 50.000', status: 'Belum Bayar' }
-  ]);
+  useEffect(() => {
+    fetchFines();
+  }, []);
 
-  // Dummy Data for Tab 2: Riwayat Denda
-  const [finesHistory, setFinesHistory] = useState([
-    { id: 'PRX-8811', student: 'Budi Santoso', nim: '120220001', days: '3 Hari', total: 'Rp. 30.000', date: '01 Juni 2026', status: 'Lunas' },
-    { id: 'PRX-8812', student: 'Siti Aminah', nim: '120220002', days: '2 Hari', total: 'Rp. 20.000', date: '02 Juni 2026', status: 'Lunas' },
-    { id: 'PRX-8813', student: 'Rian Hidayat', nim: '120220003', days: '7 Hari', total: 'Rp. 70.000', date: '03 Juni 2026', status: 'Lunas' }
-  ]);
-
-  // Handlers
-  const handlePayment = (fine) => {
-    Swal.fire({
-      title: 'Pembayaran Berhasil',
-      text: `Pembayaran denda ${fine.id} sebesar ${fine.total} untuk ${fine.student} berhasil dikonfirmasi.`,
-      icon: 'success',
-      confirmButtonColor: '#10b981'
-    });
-    // Move to history
-    const paidFine = {
-      id: fine.id,
-      student: fine.student,
-      nim: fine.nim,
-      days: fine.days,
-      total: fine.total,
-      date: '05 Juni 2026',
-      status: 'Lunas'
-    };
-    setPendingFines(pendingFines.filter(item => item.id !== fine.id));
-    setFinesHistory([paidFine, ...finesHistory]);
+  const fetchFines = async () => {
+    try {
+      setLoading(true);
+      const response = await api.get('/denda');
+      if (response.data && response.data.status === 'success') {
+        setFines(response.data.data);
+      }
+    } catch (error) {
+      console.error('Error fetching fines:', error);
+      Swal.fire({
+        title: 'Error!',
+        text: 'Gagal memuat data denda.',
+        icon: 'error',
+        confirmButtonColor: '#ef4444'
+      });
+    } finally {
+      setLoading(false);
+    }
   };
+
+  const handlePayment = async (fine) => {
+    try {
+      const response = await api.patch(`/denda/${fine.id_denda}/bayar`);
+      if (response.data && response.data.status === 'success') {
+        Swal.fire({
+          title: 'Pembayaran Berhasil',
+          text: `Pembayaran denda DEN-${fine.id_denda} sebesar Rp ${fine.jumlah_denda.toLocaleString('id-ID')} untuk ${fine.nama} berhasil dikonfirmasi.`,
+          icon: 'success',
+          confirmButtonColor: '#10b981'
+        });
+        fetchFines();
+      }
+    } catch (error) {
+      console.error('Error paying fine:', error);
+      Swal.fire({
+        title: 'Gagal!',
+        text: error.response?.data?.message || 'Gagal memproses pembayaran denda.',
+        icon: 'error',
+        confirmButtonColor: '#ef4444'
+      });
+    }
+  };
+
+  const formatDate = (dateString) => {
+    if (!dateString) return '-';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+  };
+
+  // Filter denda based on active tab
+  const pendingFines = fines.filter(item => item.status_bayar === 'belum_bayar');
+  const finesHistory = fines.filter(item => item.status_bayar === 'sudah_bayar');
 
   return (
     <div style={{
@@ -62,7 +88,7 @@ export default function Fines() {
           fontSize: '14px',
           color: '#64748b'
         }}>
-          Kelola denda keterlambatan pengembalian buku
+          Kelola denda keterlambatan pengembalian buku secara real-time.
         </p>
       </div>
 
@@ -130,7 +156,11 @@ export default function Fines() {
         boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.02), 0 1px 2px 0 rgba(0, 0, 0, 0.06)',
         overflow: 'hidden'
       }}>
-        {activeTab === 'menunggu' ? (
+        {loading ? (
+          <div style={{ padding: '40px', textAlign: 'center', color: '#64748b' }}>
+            <p style={{ margin: 0, fontSize: '15px', fontWeight: 500 }}>Memuat data denda...</p>
+          </div>
+        ) : activeTab === 'menunggu' ? (
           /* TAB 1: Menunggu Pembayaran Table */
           pendingFines.length > 0 ? (
             <div style={{ overflowX: 'auto' }}>
@@ -148,20 +178,24 @@ export default function Fines() {
                 <tbody>
                   {pendingFines.map((fine, idx) => (
                     <tr
-                      key={fine.id}
+                      key={fine.id_denda}
                       className="table-row-hover"
                       style={{
                         borderBottom: idx !== pendingFines.length - 1 ? '1px solid #f1f5f9' : 'none',
                         transition: 'background-color 0.2s'
                       }}
                     >
-                      <td style={{ padding: '14px 20px', fontSize: '13px', fontWeight: 700, color: '#475569' }}>{fine.id}</td>
+                      <td style={{ padding: '14px 20px', fontSize: '13px', fontWeight: 700, color: '#475569' }}>DEN-{fine.id_denda}</td>
                       <td style={{ padding: '14px 20px' }}>
-                        <div style={{ fontWeight: 600, fontSize: '14px', color: '#0f172a' }}>{fine.student}</div>
+                        <div style={{ fontWeight: 600, fontSize: '14px', color: '#0f172a' }}>{fine.nama}</div>
                         <div style={{ fontSize: '12px', color: '#64748b' }}>NIM: {fine.nim}</div>
                       </td>
-                      <td style={{ padding: '14px 20px', fontSize: '13px', color: '#334155' }}>{fine.days}</td>
-                      <td style={{ padding: '14px 20px', fontSize: '13px', color: '#0f172a', fontWeight: 700 }}>{fine.total}</td>
+                      <td style={{ padding: '14px 20px', fontSize: '13px', color: '#334155' }}>
+                        {fine.jumlah_denda ? `${fine.jumlah_denda / 1000} Hari` : '-'}
+                      </td>
+                      <td style={{ padding: '14px 20px', fontSize: '13px', color: '#0f172a', fontWeight: 700 }}>
+                        Rp {fine.jumlah_denda.toLocaleString('id-ID')}
+                      </td>
                       <td style={{ padding: '14px 20px' }}>
                         <span style={{
                           backgroundColor: 'rgba(239, 68, 68, 0.08)',
@@ -172,7 +206,7 @@ export default function Fines() {
                           fontWeight: 600,
                           whiteSpace: 'nowrap'
                         }}>
-                          {fine.status}
+                          Belum Bayar
                         </span>
                       </td>
                       <td style={{ padding: '14px 20px', textAlign: 'center' }}>
@@ -223,21 +257,25 @@ export default function Fines() {
                 <tbody>
                   {finesHistory.map((history, idx) => (
                     <tr
-                      key={history.id}
+                      key={history.id_denda}
                       className="table-row-hover"
                       style={{
                         borderBottom: idx !== finesHistory.length - 1 ? '1px solid #f1f5f9' : 'none',
                         transition: 'background-color 0.2s'
                       }}
                     >
-                      <td style={{ padding: '14px 20px', fontSize: '13px', fontWeight: 700, color: '#475569' }}>{history.id}</td>
+                      <td style={{ padding: '14px 20px', fontSize: '13px', fontWeight: 700, color: '#475569' }}>DEN-{history.id_denda}</td>
                       <td style={{ padding: '14px 20px' }}>
-                        <div style={{ fontWeight: 600, fontSize: '14px', color: '#0f172a' }}>{history.student}</div>
+                        <div style={{ fontWeight: 600, fontSize: '14px', color: '#0f172a' }}>{history.nama}</div>
                         <div style={{ fontSize: '12px', color: '#64748b' }}>NIM: {history.nim}</div>
                       </td>
-                      <td style={{ padding: '14px 20px', fontSize: '13px', color: '#334155' }}>{history.days}</td>
-                      <td style={{ padding: '14px 20px', fontSize: '13px', color: '#0f172a', fontWeight: 700 }}>{history.total}</td>
-                      <td style={{ padding: '14px 20px', fontSize: '13px', color: '#475569' }}>{history.date}</td>
+                      <td style={{ padding: '14px 20px', fontSize: '13px', color: '#334155' }}>
+                        {history.jumlah_denda ? `${history.jumlah_denda / 1000} Hari` : '-'}
+                      </td>
+                      <td style={{ padding: '14px 20px', fontSize: '13px', color: '#0f172a', fontWeight: 700 }}>
+                        Rp {history.jumlah_denda.toLocaleString('id-ID')}
+                      </td>
+                      <td style={{ padding: '14px 20px', fontSize: '13px', color: '#475569' }}>{formatDate(history.updated_at)}</td>
                       <td style={{ padding: '14px 20px' }}>
                         <span style={{
                           backgroundColor: 'rgba(16, 185, 129, 0.08)',
@@ -248,7 +286,7 @@ export default function Fines() {
                           fontWeight: 600,
                           whiteSpace: 'nowrap'
                         }}>
-                          {history.status}
+                          Lunas
                         </span>
                       </td>
                     </tr>

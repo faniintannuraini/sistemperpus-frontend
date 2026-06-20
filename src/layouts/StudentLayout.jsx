@@ -7,10 +7,12 @@ import '../styles/student-layout.css';
 export default function StudentLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(window.innerWidth > 768); // Default open on desktop
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+  const [profile, setProfile] = useState({ nama: 'Fani', nama_prodi: 'Teknik Informatika' });
   const location = useLocation();
   const navigate = useNavigate();
 
   useEffect(() => {
+    fetchProfile();
     const handleResize = () => {
       const mobile = window.innerWidth <= 768;
       setIsMobile(mobile);
@@ -23,6 +25,17 @@ export default function StudentLayout() {
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
+
+  const fetchProfile = async () => {
+    try {
+      const response = await api.get('/user/profil');
+      if (response.data && response.data.data) {
+        setProfile(response.data.data);
+      }
+    } catch (error) {
+      console.error('Error fetching student profile:', error);
+    }
+  };
 
   const handleLogout = () => {
     Swal.fire({
@@ -170,10 +183,10 @@ export default function StudentLayout() {
           <div className="student-navbar-right">
             <div className="user-profile-info">
               <div className="user-details">
-                <span className="user-name">Fani</span>
-                <span className="user-role">Teknik Informatika</span>
+                <span className="user-name">{profile.nama || 'Mahasiswa'}</span>
+                <span className="user-role">{profile.nama_prodi || 'Teknik Informatika'}</span>
               </div>
-              <div className="user-avatar">F</div>
+              <div className="user-avatar">{profile.nama ? profile.nama.charAt(0).toUpperCase() : 'M'}</div>
             </div>
           </div>
         </nav>
