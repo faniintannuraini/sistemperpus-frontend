@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import Swal from 'sweetalert2';
 
 export default function Users() {
   const departments = [
@@ -23,17 +24,44 @@ export default function Users() {
 
   // Action Handlers
   const handleAddUser = () => {
-    alert('Aksi Tambah Mahasiswa dipicu (Modal form tambah mahasiswa baru akan muncul).');
+    Swal.fire({
+      title: 'Tambah Mahasiswa',
+      text: 'Aksi Tambah Mahasiswa dipicu (Modal form tambah mahasiswa baru akan muncul).',
+      icon: 'info',
+      confirmButtonColor: '#10b981'
+    });
   };
 
   const handleEdit = (user) => {
-    alert(`Edit Data Mahasiswa: "${user.name}" (Modal form edit data mahasiswa akan muncul).`);
+    Swal.fire({
+      title: 'Edit Mahasiswa',
+      text: `Edit Data Mahasiswa: "${user.name}" (Modal form edit data mahasiswa akan muncul).`,
+      icon: 'info',
+      confirmButtonColor: '#3b82f6'
+    });
   };
 
   const handleHapus = (userId) => {
-    if (confirm('Apakah Anda yakin ingin menghapus mahasiswa ini dari database?')) {
-      setUsers(users.filter(u => u.id !== userId));
-    }
+    Swal.fire({
+      title: 'Hapus Mahasiswa',
+      text: 'Apakah Anda yakin ingin menghapus mahasiswa ini dari database?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#ef4444',
+      cancelButtonColor: '#64748b',
+      confirmButtonText: 'Ya, Hapus!',
+      cancelButtonText: 'Batal'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        setUsers(users.filter(u => u.id !== userId));
+        Swal.fire({
+          title: 'Terhapus!',
+          text: 'Data mahasiswa berhasil dihapus.',
+          icon: 'success',
+          confirmButtonColor: '#10b981'
+        });
+      }
+    });
   };
 
   // Filter Logic

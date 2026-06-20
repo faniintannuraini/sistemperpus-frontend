@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import Swal from 'sweetalert2';
 
 // Import cover images
 import pythonCover from '../../assets/images/python_book_cover.png';
@@ -42,17 +43,44 @@ export default function Books() {
   const [selectedProdi, setSelectedProdi] = useState('Semua Program Studi');
 
   const handleAddBook = () => {
-    alert('Aksi Tambahkan Buku dipicu (Modal form tambah buku akan muncul).');
+    Swal.fire({
+      title: 'Tambah Buku',
+      text: 'Aksi Tambahkan Buku dipicu (Modal form tambah buku akan muncul).',
+      icon: 'info',
+      confirmButtonColor: '#3b82f6'
+    });
   };
 
   const handleEdit = (book) => {
-    alert(`Edit Buku: "${book.title}" (Modal form edit buku akan muncul).`);
+    Swal.fire({
+      title: 'Edit Buku',
+      text: `Edit Buku: "${book.title}" (Modal form edit buku akan muncul).`,
+      icon: 'info',
+      confirmButtonColor: '#3b82f6'
+    });
   };
 
   const handleHapus = (bookId) => {
-    if (confirm('Apakah Anda yakin ingin menghapus buku ini?')) {
-      setBooks(books.filter((b) => b.id !== bookId));
-    }
+    Swal.fire({
+      title: 'Hapus Buku',
+      text: 'Apakah Anda yakin ingin menghapus buku ini?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#ef4444',
+      cancelButtonColor: '#64748b',
+      confirmButtonText: 'Ya, Hapus!',
+      cancelButtonText: 'Batal'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        setBooks(books.filter((b) => b.id !== bookId));
+        Swal.fire({
+          title: 'Terhapus!',
+          text: 'Buku berhasil dihapus.',
+          icon: 'success',
+          confirmButtonColor: '#10b981'
+        });
+      }
+    });
   };
 
   return (

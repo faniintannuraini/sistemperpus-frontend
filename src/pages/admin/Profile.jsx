@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import Swal from 'sweetalert2';
 
 export default function Profile() {
   const [showPassword, setShowPassword] = useState(false);
@@ -6,7 +7,12 @@ export default function Profile() {
 
   const handleResetPassword = (e) => {
     e.preventDefault();
-    alert('Aksi Reset Password dipicu (Email konfirmasi reset password telah dikirim).');
+    Swal.fire({
+      title: 'Reset Password',
+      text: 'Aksi Reset Password dipicu (Email konfirmasi reset password telah dikirim).',
+      icon: 'success',
+      confirmButtonColor: '#ef4444'
+    });
   };
 
   return (

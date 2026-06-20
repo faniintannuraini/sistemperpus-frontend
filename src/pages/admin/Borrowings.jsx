@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import Swal from 'sweetalert2';
 
 export default function Borrowings() {
   const [activeTab, setActiveTab] = useState('menunggu');
@@ -20,7 +21,12 @@ export default function Borrowings() {
 
   // Handlers
   const handleHandover = (trx) => {
-    alert(`Buku "${trx.book}" diserahkan kepada ${trx.student}. Status peminjaman aktif.`);
+    Swal.fire({
+      title: 'Peminjaman Aktif',
+      text: `Buku "${trx.book}" diserahkan kepada ${trx.student}. Status peminjaman aktif.`,
+      icon: 'success',
+      confirmButtonColor: '#2563eb'
+    });
     // Move to active loans (simulated)
     const newLoan = {
       id: trx.id,
@@ -36,7 +42,12 @@ export default function Borrowings() {
   };
 
   const handleReturn = (trx) => {
-    alert(`Pengembalian buku "${trx.book}" oleh ${trx.student} berhasil diterima.`);
+    Swal.fire({
+      title: 'Pengembalian Berhasil',
+      text: `Pengembalian buku "${trx.book}" oleh ${trx.student} berhasil diterima.`,
+      icon: 'success',
+      confirmButtonColor: '#10b981'
+    });
     // Remove from active loans (simulated)
     setActiveLoans(activeLoans.filter(item => item.id !== trx.id));
   };
