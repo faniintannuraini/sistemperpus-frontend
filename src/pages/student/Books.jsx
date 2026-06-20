@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import api from '../../services/api';
 import '../../styles/student-books.css';
 
 // Import book cover images
@@ -15,34 +16,70 @@ import pengantarAkuntansiCover from '../../assets/images/pengantar_akuntansi_cov
 export default function Books() {
   const navigate = useNavigate();
   const location = useLocation();
+  const [books, setBooks] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('Semua');
 
   // Read search query from URL query parameter 'q'
   const searchQuery = new URLSearchParams(location.search).get('q') || '';
 
-  // Dummy Categories matching Figma
-  const categories = ['Semua', 'Informatika', 'Manajemen', 'Akuntansi'];
+  useEffect(() => {
+    fetchBooks();
+    fetchCategories();
+  }, []);
 
-  // Dummy Books Data matching Figma
-  const booksData = [
-    { id: 1, title: 'Python Programming', author: 'Martin Evans', category: 'Informatika', stock: 2, year: '2022', cover: pythonCover },
-    { id: 2, title: 'Machine Learning For Beginners', author: 'Jerry N.P.', category: 'Informatika', stock: 2, year: '2022', cover: mlCover },
-    { id: 3, title: 'Expert C Programming', author: 'Peter Van Der Linden', category: 'Informatika', stock: 2, year: '2022', cover: cCover },
-    { id: 4, title: 'Pengantar Ekonomi Mikro', author: 'Sri Rahayu, S.E., M.Si.', category: 'Manajemen', stock: 2, year: '2022', cover: ekonomiMikroCover },
-    { id: 5, title: 'Akuntansi Keuangan Lanjutan', author: 'Endah Prawesti Ningrum, S.E, M.Ak', category: 'Akuntansi', stock: 2, year: '2022', cover: accountingCover },
-    { id: 6, title: 'Manajemen Operasional', author: 'Dr. H. Mochammad Zainul, S.E, M.M.', category: 'Manajemen', stock: 2, year: '2022', cover: manajemenOperasionalCover },
-    { id: 7, title: 'Algoritma Dan Pemrograman', author: 'Rinaldi Munir', category: 'Informatika', stock: 2, year: '2022', cover: algoritmaPemrogramanCover },
-    { id: 8, title: 'Pengantar Akuntansi', author: 'Iwan Koerniawan, S.E., M.Th., M.Si.', category: 'Akuntansi', stock: 2, year: '2022', cover: pengantarAkuntansiCover }
-  ];
+  const fetchBooks = async () => {
+    try {
+      const response = await api.get('/buku');
+      if (response.data && response.data.status === 'success') {
+        setBooks(response.data.data);
+      }
+    } catch (error) {
+      console.error('Error fetching books:', error);
+    }
+  };
+
+  const fetchCategories = async () => {
+    try {
+      const response = await api.get('/kategori');
+      if (response.data && response.data.status === 'success') {
+        setCategories(response.data.data);
+      }
+    } catch (error) {
+      console.error('Error fetching categories:', error);
+    }
+  };
+
+  const getCoverImage = (title, id) => {
+    const t = (title || '').toLowerCase();
+    if (t.includes('machine') || t.includes('learning') || t.includes('ml')) return mlCover;
+    if (t.includes('expert c') || t.includes(' c ') || t.includes('programming c') || t.startsWith('c ')) return cCover;
+    if (t.includes('ekonomi') || t.includes('mikro')) return ekonomiMikroCover;
+    if (t.includes('akuntansi') && t.includes('keuangan')) return accountingCover;
+    if (t.includes('akuntansi')) return pengantarAkuntansiCover;
+    if (t.includes('manajemen') || t.includes('operasional')) return manajemenOperasionalCover;
+    if (t.includes('algoritma') || t.includes('pemrograman')) return algoritmaPemrogramanCover;
+    
+    const idx = id ? parseInt(id, 10) : 0;
+    const rem = idx % 8;
+    if (rem === 1) return mlCover;
+    if (rem === 2) return cCover;
+    if (rem === 3) return ekonomiMikroCover;
+    if (rem === 4) return accountingCover;
+    if (rem === 5) return manajemenOperasionalCover;
+    if (rem === 6) return algoritmaPemrogramanCover;
+    if (rem === 7) return pengantarAkuntansiCover;
+    return pythonCover;
+  };
 
   // Filtering Logic
-  const filteredBooks = booksData.filter((book) => {
+  const filteredBooks = books.filter((book) => {
     const matchesSearch =
-      book.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      book.author.toLowerCase().includes(searchQuery.toLowerCase());
+      book.judul.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      book.pengarang.toLowerCase().includes(searchQuery.toLowerCase());
     
     const matchesCategory =
-      selectedCategory === 'Semua' || book.category === selectedCategory;
+      selectedCategory === 'Semua' || String(book.id_kategori) === String(selectedCategory);
 
     return matchesSearch && matchesCategory;
   });
@@ -57,16 +94,21 @@ export default function Books() {
 
       {/* Controls: Search and Filters */}
       <div className="controls-container">
-
         {/* Category Filters */}
         <div className="category-filter">
+          <button
+            className={`category-btn ${selectedCategory === 'Semua' ? 'active' : ''}`}
+            onClick={() => setSelectedCategory('Semua')}
+          >
+            Semua
+          </button>
           {categories.map((category) => (
             <button
-              key={category}
-              className={`category-btn ${selectedCategory === category ? 'active' : ''}`}
-              onClick={() => setSelectedCategory(category)}
+              key={category.id_kategori}
+              className={`category-btn ${String(selectedCategory) === String(category.id_kategori) ? 'active' : ''}`}
+              onClick={() => setSelectedCategory(category.id_kategori)}
             >
-              {category}
+              {category.nama_kategori}
             </button>
           ))}
         </div>
@@ -77,22 +119,22 @@ export default function Books() {
         {filteredBooks.length > 0 ? (
           filteredBooks.map((book) => (
             <div
-              key={book.id}
+              key={book.id_buku}
               className="catalog-card"
-              onClick={() => navigate(`/student/book/${book.id}`)}
+              onClick={() => navigate(`/student/book/${book.id_buku}`)}
               style={{ cursor: 'pointer' }}
             >
               {/* Cover Container */}
               <div className="cover-container">
-                <img src={book.cover} alt={book.title} className="cover-img" />
+                <img src={getCoverImage(book.judul, book.id_buku)} alt={book.judul} className="cover-img" />
               </div>
 
               {/* Book Details */}
               <div className="book-details">
-                <h3 className="book-title-h3">{book.title}</h3>
-                <p className="book-author-p">{book.author}</p>
-                <p className="book-year-p">{book.year}</p>
-                <p className="book-stock-p">Stock : {book.stock}</p>
+                <h3 className="book-title-h3">{book.judul}</h3>
+                <p className="book-author-p">{book.pengarang}</p>
+                <p className="book-year-p">{book.tahun_terbit}</p>
+                <p className="book-stock-p">Stock : {book.stok}</p>
               </div>
             </div>
           ))

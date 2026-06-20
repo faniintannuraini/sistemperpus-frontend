@@ -1,128 +1,132 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
+import api from '../../services/api';
 import '../../styles/student-book-detail.css';
 
 export default function BookDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const [book, setBook] = useState(null);
+  const [categories, setCategories] = useState([]);
   const [borrowed, setBorrowed] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [loading, setLoading] = useState(true);
 
-  // Dummy Books Database
-  const booksDb = [
-    {
-      id: 1,
-      title: 'Introduction to Algorithms',
-      author: 'Thomas H. Cormen',
-      isbn: '978-0262033848',
-      year: '2009',
-      category: 'Teknologi',
-      stock: 5,
-      emoji: '💻',
-      description: 'Buku teks komprehensif mengenai algoritma komputer. Cocok sebagai panduan belajar mahasiswa ilmu komputer maupun praktisi profesional. Buku ini mencakup berbagai jenis algoritma secara mendalam, menjadikannya standar akademis di seluruh dunia.'
-    },
-    {
-      id: 2,
-      title: 'Clean Code',
-      author: 'Robert C. Martin',
-      isbn: '978-0132350884',
-      year: '2008',
-      category: 'Teknologi',
-      stock: 3,
-      emoji: '🛠️',
-      description: 'Sebuah panduan praktis untuk menulis kode program yang bersih, rapi, dan mudah dipelihara. Ditulis oleh pakar perangkat lunak ternama, buku ini memberikan wawasan tentang bagaimana mengidentifikasi kode buruk dan bagaimana merefaktornya secara efisien.'
-    },
-    {
-      id: 3,
-      title: 'A Brief History of Time',
-      author: 'Stephen Hawking',
-      isbn: '978-0553380163',
-      year: '1998',
-      category: 'Sains',
-      stock: 2,
-      emoji: '🌌',
-      description: 'Menjelaskan konsep kosmologi modern secara populer untuk pembaca umum. Dari teori Dentuman Besar hingga lubang hitam, fisikawan Stephen Hawking memandu pembaca memahami bagaimana alam semesta terbentuk dan bekerja tanpa menggunakan bahasa matematika yang rumit.'
-    },
-    {
-      id: 4,
-      title: 'Principles of Economics',
-      author: 'N. Gregory Mankiw',
-      isbn: '978-1305155922',
-      year: '2014',
-      category: 'Bisnis',
-      stock: 0,
-      emoji: '📈',
-      description: 'Buku pengantar ekonomi terpopuler di dunia. Mankiw menyajikan materi ekonomi mikro dan makro secara kontekstual, menarik, dan relevan dengan kehidupan sehari-hari, sangat direkomendasikan bagi mahasiswa bisnis maupun masyarakat umum.'
-    },
-    {
-      id: 5,
-      title: 'The Great Gatsby',
-      author: 'F. Scott Fitzgerald',
-      isbn: '978-0743273565',
-      year: '1925',
-      category: 'Sastra',
-      stock: 4,
-      emoji: '📖',
-      description: 'Sebuah karya klasik sastra Amerika berlatar di era Jazz tahun 1920-an. Buku ini menceritakan obsesi Jay Gatsby terhadap Daisy Buchanan, yang mengeksplorasi tema-tema kekayaan, cinta, kemewahan, dekadensi, dan impian Amerika.'
-    },
-    {
-      id: 6,
-      title: 'Design Patterns',
-      author: 'Erich Gamma',
-      isbn: '978-0201633610',
-      year: '1994',
-      category: 'Teknologi',
-      stock: 1,
-      emoji: '🧩',
-      description: 'Sebuah karya legendaris mengenai pola desain berorientasi objek dalam rekayasa perangkat lunak. Memberikan solusi siap pakai untuk 23 masalah desain umum yang sering dihadapi oleh pengembang perangkat lunak berpengalaman.'
-    },
-    {
-      id: 7,
-      title: 'Cosmos',
-      author: 'Carl Sagan',
-      isbn: '978-0345331359',
-      year: '1980',
-      category: 'Sains',
-      stock: 6,
-      emoji: '🪐',
-      description: 'Perjalanan menarik menjelajahi alam semesta, sejarah sains, dan tempat umat humanity di dalamnya. Carl Sagan memadukan sains, filsafat, dan sejarah untuk melukiskan gambaran yang memukau tentang keindahan kosmik.'
-    },
-    {
-      id: 8,
-      title: 'Zero to One',
-      author: 'Peter Thiel',
-      isbn: '978-0804139298',
-      year: '2014',
-      category: 'Bisnis',
-      stock: 3,
-      emoji: '💡',
-      description: 'Buku terlaris tentang bagaimana membangun masa depan dengan menciptakan teknologi baru. Peter Thiel, salah satu pendiri PayPal dan investor awal Facebook, membagikan pandangannya tentang inovasi dan monopoli bisnis.'
+  useEffect(() => {
+    fetchBookDetails();
+    fetchCategories();
+  }, [id]);
+
+  const fetchBookDetails = async () => {
+    try {
+      setLoading(true);
+      const response = await api.get(`/buku/${id}`);
+      if (response.data && response.data.status === 'success') {
+        setBook(response.data.data);
+      }
+    } catch (error) {
+      console.error('Error fetching book details:', error);
+      Swal.fire({
+        title: 'Error!',
+        text: 'Gagal memuat detail buku.',
+        icon: 'error',
+        confirmButtonColor: '#ef4444'
+      });
+    } finally {
+      setLoading(false);
     }
-  ];
+  };
 
-  // Find the book by ID
-  const targetId = parseInt(id) || 1;
-  const book = booksDb.find((b) => b.id === targetId) || booksDb[0];
+  const fetchCategories = async () => {
+    try {
+      const response = await api.get('/kategori');
+      if (response.data && response.data.status === 'success') {
+        setCategories(response.data.data);
+      }
+    } catch (error) {
+      console.error('Error fetching categories:', error);
+    }
+  };
 
-  const currentStock = borrowed ? book.stock - 1 : book.stock;
-  const isAvailable = currentStock > 0;
+  const getCategoryName = (idKategori) => {
+    const cat = categories.find(c => String(c.id_kategori) === String(idKategori));
+    return cat ? cat.nama_kategori : 'Teknik Informatika';
+  };
 
-  const handleBorrowRequest = () => {
-    if (!isAvailable || borrowed) return;
+  const getBookEmoji = (title) => {
+    const t = (title || '').toLowerCase();
+    if (t.includes('code') || t.includes('program') || t.includes('algorithm') || t.includes('c ')) return '💻';
+    if (t.includes('sains') || t.includes('history') || t.includes('science') || t.includes('bumi')) return '🌌';
+    if (t.includes('ekonomi') || t.includes('bisnis') || t.includes('akuntansi') || t.includes('uang')) return '📈';
+    return '📖';
+  };
+
+  const handleBorrowRequest = async () => {
+    if (!book || book.stok <= 0 || borrowed) return;
 
     setSubmitting(true);
-    setTimeout(() => {
-      setSubmitting(false);
-      setBorrowed(true);
+
+    const today = new Date();
+    const formattedToday = today.toISOString().split('T')[0];
+
+    const nextWeek = new Date();
+    nextWeek.setDate(today.getDate() + 7);
+    const formattedNextWeek = nextWeek.toISOString().split('T')[0];
+
+    const payload = {
+      id_buku: book.id_buku,
+      tanggal_pinjam: formattedToday,
+      tanggal_kembali: formattedNextWeek
+    };
+
+    try {
+      const response = await api.post('/peminjaman', payload);
+      if (response.data && response.data.status === 'success') {
+        setBorrowed(true);
+        Swal.fire({
+          title: 'Pengajuan Berhasil!',
+          text: `Permintaan peminjaman buku "${book.judul}" telah berhasil diajukan, menunggu persetujuan admin.`,
+          icon: 'success',
+          confirmButtonColor: '#2563eb'
+        });
+        // Refresh details to sync stock count
+        fetchBookDetails();
+      }
+    } catch (error) {
+      console.error('Error borrowing book:', error);
+      const errorMsg = error.response?.data?.message || 'Gagal mengajukan peminjaman buku.';
       Swal.fire({
-        title: 'Pengajuan Berhasil!',
-        text: `Permintaan peminjaman buku "${book.title}" telah berhasil diajukan.`,
-        icon: 'success',
-        confirmButtonColor: '#2563eb'
+        title: 'Gagal!',
+        text: errorMsg,
+        icon: 'error',
+        confirmButtonColor: '#ef4444'
       });
-    }, 800);
+    } finally {
+      setSubmitting(false);
+    }
   };
+
+  if (loading) {
+    return (
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '60vh', color: '#64748b' }}>
+        <h3>Memuat detail buku...</h3>
+      </div>
+    );
+  }
+
+  if (!book) {
+    return (
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '60vh', color: '#64748b', flexDirection: 'column' }}>
+        <h3>Buku tidak ditemukan</h3>
+        <button onClick={() => navigate('/student/explore')} style={{ marginTop: '16px', padding: '10px 20px', backgroundColor: '#3b82f6', color: '#fff', border: 'none', borderRadius: '8px', cursor: 'pointer' }}>
+          Kembali ke Katalog
+        </button>
+      </div>
+    );
+  }
+
+  const isAvailable = book.stok > 0;
 
   return (
     <div className="detail-page-wrapper">
@@ -141,7 +145,7 @@ export default function BookDetail() {
         {/* Left Column - Cover & Borrow Action Button */}
         <div className="detail-left-column">
           <div className="large-cover">
-            <span>{book.emoji}</span>
+            <span>{getBookEmoji(book.judul)}</span>
           </div>
 
           <div className="borrow-action-wrapper">
@@ -168,7 +172,7 @@ export default function BookDetail() {
 
             {borrowed && (
               <div className="success-borrow-msg">
-                <svg xmlns="http://www.w3.org/2000/svg" style={{ width: '18px', height: '18px', shrink: 0 }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                <svg xmlns="http://www.w3.org/2000/svg" style={{ width: '18px', height: '18px', flexShrink: 0 }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
                 Permintaan peminjaman berhasil diajukan!
@@ -181,21 +185,23 @@ export default function BookDetail() {
         <div className="detail-right-column">
           <div className="detail-header-info">
             <div className="detail-badges-row">
-              <span className="detail-category-tag">{book.category}</span>
+              <span className="detail-category-tag">{getCategoryName(book.id_kategori)}</span>
               <span className={`detail-status-badge ${isAvailable ? 'available' : 'unavailable'}`}>
-                {isAvailable ? `Tersedia (${currentStock})` : 'Stok Habis'}
+                {isAvailable ? `Tersedia (${book.stok})` : 'Stok Habis'}
               </span>
             </div>
-            <h1 className="detail-title-h1">{book.title}</h1>
+            <h1 className="detail-title-h1">{book.judul}</h1>
             <p className="detail-author-p">
-              Ditulis oleh <span className="author-link-style">{book.author}</span>
+              Ditulis oleh <span className="author-link-style">{book.pengarang}</span>
             </p>
           </div>
 
           {/* Description Section */}
           <div className="description-sec">
             <h3 className="description-title">Sinopsis</h3>
-            <p className="description-content">{book.description}</p>
+            <p className="description-content">
+              Buku teks komprehensif berjudul "{book.judul}" ditulis oleh {book.pengarang} yang diterbitkan oleh {book.penerbit}. Buku ini sangat direkomendasikan untuk menunjang perkuliahan, riset akademik, maupun referensi profesional.
+            </p>
           </div>
 
           {/* Modern Details Card */}
@@ -203,16 +209,16 @@ export default function BookDetail() {
             <h3 className="description-title" style={{ marginTop: 0, marginBottom: '16px' }}>Informasi Detail</h3>
             <div className="metadata-grid">
               <div className="metadata-item">
-                <span className="metadata-label">ISBN</span>
-                <span className="metadata-value">{book.isbn}</span>
+                <span className="metadata-label">Penerbit</span>
+                <span className="metadata-value">{book.penerbit || '-'}</span>
               </div>
               <div className="metadata-item">
                 <span className="metadata-label">Tahun Terbit</span>
-                <span className="metadata-value">{book.year}</span>
+                <span className="metadata-value">{book.tahun_terbit}</span>
               </div>
               <div className="metadata-item">
-                <span className="metadata-label">Kategori</span>
-                <span className="metadata-value">{book.category}</span>
+                <span className="metadata-label">Lokasi Rak</span>
+                <span className="metadata-value">{book.rak || '-'}</span>
               </div>
             </div>
           </div>
