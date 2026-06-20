@@ -54,6 +54,29 @@ export default function Borrowings() {
     }
   };
 
+  const handleReject = async (trx) => {
+    try {
+      const response = await api.patch(`/peminjaman/${trx.id_transaksi}/tolak`);
+      if (response.data && response.data.status === 'success') {
+        Swal.fire({
+          title: 'Peminjaman Ditolak',
+          text: `Peminjaman buku "${trx.book_title}" oleh ${trx.student_name} telah ditolak.`,
+          icon: 'success',
+          confirmButtonColor: '#ef4444'
+        });
+        fetchBorrowings();
+      }
+    } catch (error) {
+      console.error('Error rejecting book:', error);
+      Swal.fire({
+        title: 'Gagal!',
+        text: error.response?.data?.message || 'Gagal menolak peminjaman buku.',
+        icon: 'error',
+        confirmButtonColor: '#ef4444'
+      });
+    }
+  };
+
   const handleReturn = async (trx) => {
     try {
       const response = await api.patch(`/peminjaman/${trx.id_transaksi}/kembalikan`);
@@ -195,7 +218,7 @@ export default function Borrowings() {
                     <th style={{ padding: '16px 20px', color: '#64748b', fontSize: '12px', fontWeight: 600 }}>DETAIL BUKU</th>
                     <th style={{ padding: '16px 20px', color: '#64748b', fontSize: '12px', fontWeight: 600 }}>WAKTU REQUEST</th>
                     <th style={{ padding: '16px 20px', color: '#64748b', fontSize: '12px', fontWeight: 600 }}>STATUS</th>
-                    <th style={{ padding: '16px 20px', color: '#64748b', fontSize: '12px', fontWeight: 600, textAlign: 'center', width: '180px' }}>AKSI KONFIRMASI</th>
+                    <th style={{ padding: '16px 20px', color: '#64748b', fontSize: '12px', fontWeight: 600, textAlign: 'center', width: '200px' }}>AKSI KONFIRMASI</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -229,24 +252,44 @@ export default function Borrowings() {
                         </span>
                       </td>
                       <td style={{ padding: '14px 20px', textAlign: 'center' }}>
-                        <button
-                          onClick={() => handleHandover(req)}
-                          className="action-btn-handover"
-                          style={{
-                            backgroundColor: '#2563eb',
-                            color: '#ffffff',
-                            border: 'none',
-                            borderRadius: '8px',
-                            padding: '8px 16px',
-                            fontSize: '12px',
-                            fontWeight: 600,
-                            cursor: 'pointer',
-                            transition: 'background-color 0.2s',
-                            boxShadow: '0 2px 4px rgba(37, 99, 235, 0.1)'
-                          }}
-                        >
-                          Serahkan Buku
-                        </button>
+                        <div style={{ display: 'flex', gap: '8px', justifyContent: 'center' }}>
+                          <button
+                            onClick={() => handleHandover(req)}
+                            className="action-btn-handover"
+                            style={{
+                              backgroundColor: '#2563eb',
+                              color: '#ffffff',
+                              border: 'none',
+                              borderRadius: '8px',
+                              padding: '8px 12px',
+                              fontSize: '12px',
+                              fontWeight: 600,
+                              cursor: 'pointer',
+                              transition: 'background-color 0.2s',
+                              boxShadow: '0 2px 4px rgba(37, 99, 235, 0.1)'
+                            }}
+                          >
+                            Setujui
+                          </button>
+                          <button
+                            onClick={() => handleReject(req)}
+                            className="action-btn-reject"
+                            style={{
+                              backgroundColor: '#ef4444',
+                              color: '#ffffff',
+                              border: 'none',
+                              borderRadius: '8px',
+                              padding: '8px 12px',
+                              fontSize: '12px',
+                              fontWeight: 600,
+                              cursor: 'pointer',
+                              transition: 'background-color 0.2s',
+                              boxShadow: '0 2px 4px rgba(239, 68, 68, 0.1)'
+                            }}
+                          >
+                            Tolak
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))}
@@ -345,6 +388,9 @@ export default function Borrowings() {
         }
         .action-btn-handover:hover {
           background-color: #1d4ed8 !important;
+        }
+        .action-btn-reject:hover {
+          background-color: #dc2626 !important;
         }
         .action-btn-return:hover {
           background-color: #059669 !important;
