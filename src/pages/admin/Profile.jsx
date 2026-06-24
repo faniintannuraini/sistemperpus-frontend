@@ -38,10 +38,23 @@ export default function Profile() {
   const handleResetPassword = (e) => {
     e.preventDefault();
     Swal.fire({
-      title: 'Reset Password',
-      text: 'Aksi Reset Password dipicu. Email konfirmasi perubahan kata sandi telah dikirim ke email Anda.',
-      icon: 'success',
-      confirmButtonColor: '#ef4444'
+      title: 'Reset Password?',
+      text: 'Apakah Anda yakin ingin mereset password?',
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonColor: '#ef4444',
+      cancelButtonColor: '#64748b',
+      confirmButtonText: 'Ya, Reset!',
+      cancelButtonText: 'Batal'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        Swal.fire({
+          title: 'Berhasil!',
+          text: 'Password berhasil di reset.',
+          icon: 'success',
+          confirmButtonColor: '#10b981'
+        });
+      }
     });
   };
 

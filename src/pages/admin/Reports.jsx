@@ -50,7 +50,7 @@ export default function Reports() {
   };
 
   // Export Handlers
-  const handleExportPDF = () => {
+  const handleExportPDF = async () => {
     Swal.fire({
       title: 'Mengekspor PDF...',
       text: 'Mohon tunggu sebentar, sistem sedang menyiapkan laporan PDF.',
@@ -59,16 +59,219 @@ export default function Reports() {
         Swal.showLoading();
         try {
           const jenis = activeTab === 'stok' ? 'buku' : activeTab;
-          await api.get(`/laporan/export/pdf?jenis=${jenis}`);
-          setTimeout(() => {
+          const response = await api.get(`/laporan/export/pdf?jenis=${jenis}`);
+          
+          if (response.data && response.data.status === 'success') {
+            const data = response.data.data;
+            if (!data || data.length === 0) {
+              Swal.fire({
+                title: 'Data Kosong',
+                text: 'Tidak ada data untuk diekspor.',
+                icon: 'warning',
+                confirmButtonColor: '#ef4444'
+              });
+              return;
+            }
+            
+            // Generate print window HTML
+            const printWindow = window.open('', '_blank');
+            if (!printWindow) {
+              Swal.fire({
+                title: 'Pop-up Terblokir',
+                text: 'Harap izinkan pop-up untuk mengunduh laporan PDF.',
+                icon: 'warning',
+                confirmButtonColor: '#ef4444'
+              });
+              return;
+            }
+            
+            let tableHeaders = '';
+            let tableRows = '';
+            
+            if (jenis === 'peminjaman' || jenis === 'pengembalian') {
+              tableHeaders = `
+                <th>No</th>
+                <th>No Transaksi</th>
+                <th>NIM</th>
+                <th>Nama Mahasiswa</th>
+                <th>Judul Buku</th>
+                <th>Tgl Pinjam</th>
+                <th>Tgl Kembali</th>
+                <th>Status</th>
+              `;
+              tableRows = data.map((row, idx) => `
+                <tr>
+                  <td>${idx + 1}</td>
+                  <td>TRX-${row.id_transaksi}</td>
+                  <td>${row.nim || '-'}</td>
+                  <td>${row.nama || 'Mahasiswa'}</td>
+                  <td>${row.judul_buku}</td>
+                  <td>${formatDate(row.tanggal_pinjam)}</td>
+                  <td>${formatDate(row.tanggal_kembali)}</td>
+                  <td><span class="status-badge">${row.status}</span></td>
+                </tr>
+              `).join('');
+            } else if (jenis === 'denda') {
+              tableHeaders = `
+                <th>No</th>
+                <th>ID Denda</th>
+                <th>NIM</th>
+                <th>Nama Mahasiswa</th>
+                <th>Judul Buku</th>
+                <th>Jumlah Denda</th>
+                <th>Status Bayar</th>
+                <th>Tanggal</th>
+              `;
+              tableRows = data.map((row, idx) => `
+                <tr>
+                  <td>${idx + 1}</td>
+                  <td>DND-${row.id_denda}</td>
+                  <td>${row.nim || '-'}</td>
+                  <td>${row.nama || 'Mahasiswa'}</td>
+                  <td>${row.judul_buku}</td>
+                  <td>Rp ${parseFloat(row.jumlah_denda).toLocaleString('id-ID')}</td>
+                  <td><span class="status-badge">${row.status_bayar}</span></td>
+                  <td>${formatDate(row.created_at)}</td>
+                </tr>
+              `).join('');
+            } else if (jenis === 'buku') {
+              tableHeaders = `
+                <th>No</th>
+                <th>Judul Buku</th>
+                <th>Penulis</th>
+                <th>Penerbit</th>
+                <th>Tahun</th>
+                <th>Stok</th>
+                <th>Kategori</th>
+                <th>Lokasi Rak</th>
+              `;
+              tableRows = data.map((row, idx) => `
+                <tr>
+                  <td>${idx + 1}</td>
+                  <td><strong>${row.judul}</strong></td>
+                  <td>${row.pengarang}</td>
+                  <td>${row.penerbit}</td>
+                  <td>${row.tahun_terbit}</td>
+                  <td>${row.stok} pcs</td>
+                  <td>${row.nama_kategori || 'Umum'}</td>
+                  <td>${row.rak || '-'}</td>
+                </tr>
+              `).join('');
+            }
+            
+            const htmlContent = `
+              <html>
+              <head>
+                <title>Laporan ${jenis.toUpperCase()} - Perpustakaan UNPER</title>
+                <style>
+                  body {
+                    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+                    color: #333;
+                    padding: 40px;
+                    margin: 0;
+                  }
+                  .header {
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    border-bottom: 3px double #ddd;
+                    padding-bottom: 20px;
+                    margin-bottom: 30px;
+                  }
+                  .brand {
+                    font-size: 24px;
+                    font-weight: bold;
+                    color: #2563eb;
+                  }
+                  .title {
+                    font-size: 18px;
+                    text-transform: uppercase;
+                    letter-spacing: 0.5px;
+                    margin-top: 5px;
+                    color: #475569;
+                  }
+                  .meta {
+                    font-size: 12px;
+                    color: #64748b;
+                    text-align: right;
+                  }
+                  table {
+                    width: 100%;
+                    border-collapse: collapse;
+                    margin-bottom: 30px;
+                  }
+                  th, td {
+                    border: 1px solid #cbd5e1;
+                    padding: 10px 12px;
+                    font-size: 12px;
+                    text-align: left;
+                  }
+                  th {
+                    background-color: #f1f5f9;
+                    font-weight: bold;
+                    color: #1e293b;
+                  }
+                  tr:nth-child(even) {
+                    background-color: #f8fafc;
+                  }
+                  .status-badge {
+                    padding: 3px 8px;
+                    border-radius: 4px;
+                    font-size: 11px;
+                    font-weight: bold;
+                    text-transform: uppercase;
+                  }
+                  @media print {
+                    body { padding: 0; }
+                    .no-print { display: none; }
+                  }
+                </style>
+              </head>
+              <body>
+                <div class="header">
+                  <div>
+                    <div class="brand">PERPUSTAKAAN UNPER</div>
+                    <div class="title">Laporan ${jenis}</div>
+                  </div>
+                  <div class="meta">
+                    <div>Dicetak pada: ${new Date().toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</div>
+                    <div>Oleh: Sistem Informasi Perpustakaan</div>
+                  </div>
+                </div>
+                
+                <table>
+                  <thead>
+                    <tr>
+                      ${tableHeaders}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    ${tableRows}
+                  </tbody>
+                </table>
+                
+                <script>
+                  window.onload = function() {
+                    window.print();
+                    setTimeout(function() { window.close(); }, 500);
+                  }
+                </script>
+              </body>
+              </html>
+            `;
+            
+            printWindow.document.write(htmlContent);
+            printWindow.document.close();
+            
             Swal.fire({
               title: 'Ekspor Berhasil!',
-              text: `Laporan ${activeTab} telah berhasil diekspor ke format PDF.`,
+              text: `Laporan ${activeTab} telah berhasil diekspor ke PDF.`,
               icon: 'success',
               confirmButtonColor: '#ef4444'
             });
-          }, 1000);
+          }
         } catch (error) {
+          console.error(error);
           Swal.fire({
             title: 'Gagal!',
             text: 'Gagal mengekspor laporan ke PDF.',
@@ -89,16 +292,92 @@ export default function Reports() {
         Swal.showLoading();
         try {
           const jenis = activeTab === 'stok' ? 'buku' : activeTab;
-          await api.get(`/laporan/export/excel?jenis=${jenis}`);
-          setTimeout(() => {
+          const response = await api.get(`/laporan/export/excel?jenis=${jenis}`);
+          
+          if (response.data && response.data.status === 'success') {
+            const data = response.data.data;
+            if (!data || data.length === 0) {
+              Swal.fire({
+                title: 'Data Kosong',
+                text: 'Tidak ada data untuk diekspor.',
+                icon: 'warning',
+                confirmButtonColor: '#10b981'
+              });
+              return;
+            }
+            
+            // Build CSV content
+            let csvContent = "\uFEFF"; // BOM for UTF-8
+            
+            // Define headers based on report type
+            let headers = [];
+            if (jenis === 'peminjaman' || jenis === 'pengembalian') {
+              headers = ['No Transaksi', 'NIM', 'Nama Mahasiswa', 'Judul Buku', 'Tanggal Pinjam', 'Tanggal Kembali', 'Status'];
+            } else if (jenis === 'denda') {
+              headers = ['ID Denda', 'NIM', 'Nama Mahasiswa', 'Judul Buku', 'Jumlah Denda', 'Status Bayar', 'Tanggal'];
+            } else if (jenis === 'buku') {
+              headers = ['ID Buku', 'Judul Buku', 'Penulis', 'Penerbit', 'Tahun Terbit', 'Stok', 'Kategori', 'Rak'];
+            }
+            
+            csvContent += headers.map(h => `"${h.replace(/"/g, '""')}"`).join(',') + '\r\n';
+            
+            // Map rows
+            data.forEach((row) => {
+              let rowData = [];
+              if (jenis === 'peminjaman' || jenis === 'pengembalian') {
+                rowData = [
+                  row.id_transaksi,
+                  row.nim,
+                  row.nama,
+                  row.judul_buku,
+                  row.tanggal_pinjam,
+                  row.tanggal_kembali || '-',
+                  row.status
+                ];
+              } else if (jenis === 'denda') {
+                rowData = [
+                  row.id_denda,
+                  row.nim,
+                  row.nama,
+                  row.judul_buku,
+                  row.jumlah_denda,
+                  row.status_bayar,
+                  row.created_at
+                ];
+              } else if (jenis === 'buku') {
+                rowData = [
+                  row.id_buku,
+                  row.judul,
+                  row.pengarang,
+                  row.penerbit,
+                  row.tahun_terbit,
+                  row.stok,
+                  row.nama_kategori || 'Umum',
+                  row.rak || '-'
+                ];
+              }
+              csvContent += rowData.map(val => `"${String(val ?? '').replace(/"/g, '""')}"`).join(',') + '\r\n';
+            });
+            
+            // Download Blob
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.setAttribute("href", url);
+            link.setAttribute("download", `Laporan_${jenis}_${new Date().toISOString().split('T')[0]}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
             Swal.fire({
               title: 'Ekspor Berhasil!',
-              text: `Laporan ${activeTab} telah berhasil diekspor ke format Excel (.xlsx).`,
+              text: `Laporan ${activeTab} telah berhasil diekspor ke format Excel (CSV).`,
               icon: 'success',
               confirmButtonColor: '#10b981'
             });
-          }, 1000);
+          }
         } catch (error) {
+          console.error(error);
           Swal.fire({
             title: 'Gagal!',
             text: 'Gagal mengekspor laporan ke Excel.',
