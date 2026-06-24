@@ -120,6 +120,45 @@ export default function Users() {
     });
   };
 
+  const executeSave = async (payload) => {
+    try {
+      if (modalMode === 'add') {
+        const response = await api.post('/admin/user', payload);
+        if (response.data && response.data.status === 'success') {
+          Swal.fire({
+            title: 'Berhasil!',
+            text: 'Data mahasiswa baru berhasil ditambahkan.',
+            icon: 'success',
+            confirmButtonColor: '#10b981'
+          });
+          fetchUsers();
+          setIsModalOpen(false);
+        }
+      } else {
+        const response = await api.put(`/admin/user/${formData.id_user}`, payload);
+        if (response.data && response.data.status === 'success') {
+          Swal.fire({
+            title: 'Berhasil!',
+            text: formData.password ? 'Password berhasil di reset.' : 'Data mahasiswa berhasil diperbarui.',
+            icon: 'success',
+            confirmButtonColor: '#10b981'
+          });
+          fetchUsers();
+          setIsModalOpen(false);
+        }
+      }
+    } catch (error) {
+      console.error('Error saving user:', error);
+      const errorMsg = error.response?.data?.message || 'Gagal menyimpan data mahasiswa.';
+      Swal.fire({
+        title: 'Gagal!',
+        text: errorMsg,
+        icon: 'error',
+        confirmButtonColor: '#ef4444'
+      });
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!formData.nama.trim() || !formData.nim.trim() || !formData.email.trim() || !formData.id_prodi) {
@@ -205,41 +244,23 @@ export default function Users() {
       payload.password = formData.password;
     }
 
-    try {
-      if (modalMode === 'add') {
-        const response = await api.post('/admin/user', payload);
-        if (response.data && response.data.status === 'success') {
-          Swal.fire({
-            title: 'Berhasil!',
-            text: 'Data mahasiswa baru berhasil ditambahkan.',
-            icon: 'success',
-            confirmButtonColor: '#10b981'
-          });
-          fetchUsers();
-          setIsModalOpen(false);
-        }
-      } else {
-        const response = await api.put(`/admin/user/${formData.id_user}`, payload);
-        if (response.data && response.data.status === 'success') {
-          Swal.fire({
-            title: 'Berhasil!',
-            text: 'Data mahasiswa berhasil diperbarui.',
-            icon: 'success',
-            confirmButtonColor: '#10b981'
-          });
-          fetchUsers();
-          setIsModalOpen(false);
-        }
-      }
-    } catch (error) {
-      console.error('Error saving user:', error);
-      const errorMsg = error.response?.data?.message || 'Gagal menyimpan data mahasiswa.';
+    if (modalMode === 'edit' && formData.password) {
       Swal.fire({
-        title: 'Gagal!',
-        text: errorMsg,
-        icon: 'error',
-        confirmButtonColor: '#ef4444'
+        title: 'Reset Password?',
+        text: 'Apakah Anda yakin ingin mereset password mahasiswa ini?',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#10b981',
+        cancelButtonColor: '#64748b',
+        confirmButtonText: 'Ya, Reset!',
+        cancelButtonText: 'Batal'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          executeSave(payload);
+        }
       });
+    } else {
+      executeSave(payload);
     }
   };
 
@@ -513,31 +534,50 @@ export default function Users() {
             className="modal-scrollable"
             style={{
               backgroundColor: '#ffffff',
-              borderRadius: '16px',
+              borderRadius: '20px',
               width: '100%',
-              maxWidth: '500px',
+              maxWidth: '460px',
               maxHeight: '90vh',
               overflowY: 'auto',
-              boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+              boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.15)',
               animation: 'modalSlideUp 0.3s ease-out'
             }}
           >
             {/* Modal Header */}
             <div style={{
-              padding: '20px 24px',
+              padding: '24px 32px 16px 32px',
               borderBottom: '1px solid #f1f5f9',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between'
             }}>
-              <h2 style={{
-                margin: 0,
-                fontSize: '18px',
-                fontWeight: 700,
-                color: '#0f172a'
-              }}>
-                {modalMode === 'add' ? 'Tambah Mahasiswa Baru' : 'Edit Data Mahasiswa'}
-              </h2>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+                <div style={{
+                  width: '40px',
+                  height: '40px',
+                  borderRadius: '10px',
+                  backgroundColor: '#e6f4ea',
+                  color: '#137333',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ width: '22px', height: '22px' }}>
+                    <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                    <circle cx="8.5" cy="7" r="4" />
+                    <line x1="20" y1="8" x2="20" y2="14" />
+                    <line x1="17" y1="11" x2="23" y2="11" />
+                  </svg>
+                </div>
+                <h2 style={{
+                  margin: 0,
+                  fontSize: '18px',
+                  fontWeight: 700,
+                  color: '#0f172a'
+                }}>
+                  {modalMode === 'add' ? 'Tambah Mahasiswa Baru' : 'Edit Data Mahasiswa'}
+                </h2>
+              </div>
               <button
                 type="button"
                 onClick={() => setIsModalOpen(false)}
@@ -546,11 +586,14 @@ export default function Users() {
                   border: 'none',
                   color: '#94a3b8',
                   cursor: 'pointer',
-                  padding: '4px',
+                  padding: '6px',
                   display: 'flex',
                   alignItems: 'center',
-                  justifyContent: 'center'
+                  justifyContent: 'center',
+                  borderRadius: '50%',
+                  transition: 'background-color 0.2s'
                 }}
+                className="modal-close-hover"
               >
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ width: '20px', height: '20px' }}>
                   <line x1="18" y1="6" x2="6" y2="18" />
@@ -560,99 +603,133 @@ export default function Users() {
             </div>
 
             {/* Modal Body */}
-            <form onSubmit={handleSubmit} style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              {/* Nama Input */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                <label style={{ fontSize: '13px', fontWeight: 600, color: '#475569' }}>Nama Lengkap</label>
-                <input
-                  type="text"
-                  required
-                  placeholder="Contoh: Fani Intan Nuraini"
-                  value={formData.nama}
-                  onChange={(e) => setFormData({ ...formData, nama: e.target.value })}
-                  style={{
-                    padding: '10px 14px',
-                    fontSize: '14px',
-                    borderRadius: '8px',
-                    border: '1px solid #cbd5e1',
-                    outline: 'none',
-                    transition: 'border-color 0.2s'
-                  }}
-                  className="modal-input"
-                />
-              </div>
-
+            <form onSubmit={handleSubmit} style={{ padding: '32px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+              
               {/* NIM Input */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                <label style={{ fontSize: '13px', fontWeight: 600, color: '#475569' }}>NIM</label>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <label style={{ fontSize: '13px', fontWeight: 600, color: '#475569' }}>Nomor Induk Mahasiswa (NIM)</label>
                 <input
                   type="text"
                   required
                   pattern="[0-9]*"
                   inputMode="numeric"
-                  placeholder="Contoh: 2201012"
+                  placeholder="Contoh : 2022010"
                   value={formData.nim}
                   onChange={(e) => setFormData({ ...formData, nim: e.target.value })}
                   style={{
-                    padding: '10px 14px',
+                    padding: '12px 16px',
                     fontSize: '14px',
-                    borderRadius: '8px',
-                    border: '1px solid #cbd5e1',
+                    borderRadius: '12px',
+                    border: 'none',
+                    backgroundColor: '#f1f5f9',
                     outline: 'none',
-                    transition: 'border-color 0.2s'
+                    color: '#0f172a',
+                    boxSizing: 'border-box',
+                    width: '100%',
+                    transition: 'all 0.2s'
                   }}
-                  className="modal-input"
+                  className="modal-input-field"
+                />
+              </div>
+
+              {/* Nama Input */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <label style={{ fontSize: '13px', fontWeight: 600, color: '#475569' }}>Nama Lengkap</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="Masukkan Nama Lengkap..."
+                  value={formData.nama}
+                  onChange={(e) => setFormData({ ...formData, nama: e.target.value })}
+                  style={{
+                    padding: '12px 16px',
+                    fontSize: '14px',
+                    borderRadius: '12px',
+                    border: 'none',
+                    backgroundColor: '#f1f5f9',
+                    outline: 'none',
+                    color: '#0f172a',
+                    boxSizing: 'border-box',
+                    width: '100%',
+                    transition: 'all 0.2s'
+                  }}
+                  className="modal-input-field"
                 />
               </div>
 
               {/* Program Studi Select */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                 <label style={{ fontSize: '13px', fontWeight: 600, color: '#475569' }}>Program Studi</label>
-                <select
-                  value={formData.id_prodi}
-                  onChange={(e) => setFormData({ ...formData, id_prodi: e.target.value })}
-                  style={{
-                    padding: '10px 14px',
-                    fontSize: '14px',
-                    borderRadius: '8px',
-                    border: '1px solid #cbd5e1',
-                    backgroundColor: '#ffffff',
-                    outline: 'none',
-                    cursor: 'pointer'
-                  }}
-                >
-                  <option value="" disabled>Pilih Program Studi</option>
-                  {prodis.map((p) => (
-                    <option key={p.id_prodi} value={p.id_prodi}>
-                      {p.nama_prodi}
-                    </option>
-                  ))}
-                </select>
+                <div style={{ position: 'relative', width: '100%' }}>
+                  <select
+                    value={formData.id_prodi}
+                    onChange={(e) => setFormData({ ...formData, id_prodi: e.target.value })}
+                    style={{
+                      padding: '12px 16px',
+                      fontSize: '14px',
+                      borderRadius: '12px',
+                      border: 'none',
+                      backgroundColor: '#f1f5f9',
+                      outline: 'none',
+                      color: '#0f172a',
+                      width: '100%',
+                      cursor: 'pointer',
+                      appearance: 'none',
+                      boxSizing: 'border-box'
+                    }}
+                    className="modal-select-field"
+                  >
+                    <option value="" disabled>Program Studi</option>
+                    {prodis.map((p) => (
+                      <option key={p.id_prodi} value={p.id_prodi}>
+                        {p.nama_prodi}
+                      </option>
+                    ))}
+                  </select>
+                  <div style={{
+                    position: 'absolute',
+                    right: '16px',
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    pointerEvents: 'none',
+                    color: '#64748b',
+                    display: 'flex',
+                    alignItems: 'center'
+                  }}>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ width: '16px', height: '16px' }}>
+                      <polyline points="6 9 12 15 18 9" />
+                    </svg>
+                  </div>
+                </div>
               </div>
 
               {/* Email Input */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                <label style={{ fontSize: '13px', fontWeight: 600, color: '#475569' }}>Email</label>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <label style={{ fontSize: '13px', fontWeight: 600, color: '#475569' }}>Email Kampus</label>
                 <input
                   type="email"
                   required
-                  placeholder="Contoh: fani@student.unper.ac.id"
+                  placeholder="nim@student.unper.ac.id"
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   style={{
-                    padding: '10px 14px',
+                    padding: '12px 16px',
                     fontSize: '14px',
-                    borderRadius: '8px',
-                    border: '1px solid #cbd5e1',
+                    borderRadius: '12px',
+                    border: 'none',
+                    backgroundColor: '#f1f5f9',
                     outline: 'none',
-                    transition: 'border-color 0.2s'
+                    color: '#0f172a',
+                    boxSizing: 'border-box',
+                    width: '100%',
+                    transition: 'all 0.2s'
                   }}
-                  className="modal-input"
+                  className="modal-input-field"
                 />
               </div>
 
               {/* Password Input */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                 <label style={{ fontSize: '13px', fontWeight: 600, color: '#475569' }}>
                   Password {modalMode === 'edit' && '(Kosongkan jika tidak ingin mengubah)'}
                 </label>
@@ -660,27 +737,29 @@ export default function Users() {
                   <input
                     type={showPassword ? 'text' : 'password'}
                     required={modalMode === 'add'}
-                    placeholder={modalMode === 'add' ? "Minimal 6 karakter & kombinasi" : "Masukkan password baru"}
+                    placeholder={modalMode === 'add' ? "Masukkan Password..." : "Masukkan password baru"}
                     value={formData.password}
                     onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                     style={{
-                      padding: '10px 40px 10px 14px',
+                      padding: '12px 48px 12px 16px',
                       fontSize: '14px',
-                      borderRadius: '8px',
-                      border: '1px solid #cbd5e1',
+                      borderRadius: '12px',
+                      border: 'none',
+                      backgroundColor: '#f1f5f9',
                       outline: 'none',
-                      transition: 'border-color 0.2s',
+                      color: '#0f172a',
                       width: '100%',
-                      boxSizing: 'border-box'
+                      boxSizing: 'border-box',
+                      transition: 'all 0.2s'
                     }}
-                    className={`modal-input ${isPasswordValInvalid ? 'invalid-password' : ''}`}
+                    className={`modal-input-field ${isPasswordValInvalid ? 'invalid-password' : ''}`}
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
                     style={{
                       position: 'absolute',
-                      right: '12px',
+                      right: '16px',
                       background: 'none',
                       border: 'none',
                       cursor: 'pointer',
@@ -691,12 +770,12 @@ export default function Users() {
                     }}
                   >
                     {showPassword ? (
-                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} style={{ width: '18px', height: '18px' }}>
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5} style={{ width: '18px', height: '18px' }}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.644 11.082 11.082 0 0117.828 0 1.012 1.012 0 010 .644 11.082 11.082 0 01-17.828 0z" />
                         <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                       </svg>
                     ) : (
-                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} style={{ width: '18px', height: '18px' }}>
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5} style={{ width: '18px', height: '18px' }}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88" />
                       </svg>
                     )}
@@ -718,15 +797,15 @@ export default function Users() {
                   type="button"
                   onClick={() => setIsModalOpen(false)}
                   style={{
-                    padding: '10px 18px',
+                    padding: '10px 24px',
                     fontSize: '14px',
                     fontWeight: 600,
-                    borderRadius: '8px',
+                    borderRadius: '24px',
                     border: '1px solid #cbd5e1',
                     backgroundColor: '#ffffff',
                     color: '#475569',
                     cursor: 'pointer',
-                    transition: 'background-color 0.2s'
+                    transition: 'all 0.2s'
                   }}
                   className="modal-cancel-btn"
                 >
@@ -735,19 +814,27 @@ export default function Users() {
                 <button
                   type="submit"
                   style={{
-                    padding: '10px 18px',
+                    padding: '10px 24px',
                     fontSize: '14px',
                     fontWeight: 600,
-                    borderRadius: '8px',
+                    borderRadius: '24px',
                     border: 'none',
-                    backgroundColor: modalMode === 'add' ? '#10b981' : '#3b82f6',
+                    backgroundColor: '#0f9d58',
                     color: '#ffffff',
                     cursor: 'pointer',
-                    transition: 'background-color 0.2s'
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    transition: 'all 0.2s'
                   }}
-                  className="modal-submit-btn"
+                  className="modal-submit-btn-user"
                 >
-                  Simpan
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ width: '16px', height: '16px' }}>
+                    <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
+                    <polyline points="17 21 17 13 7 13 7 21" />
+                    <polyline points="7 3 7 8 15 8" />
+                  </svg>
+                  Simpan Data
                 </button>
               </div>
             </form>
@@ -780,8 +867,13 @@ export default function Users() {
             opacity: 1;
           }
         }
-        .modal-input:focus {
-          border-color: #3b82f6 !important;
+        .modal-input-field:focus,
+        .modal-select-field:focus {
+          background-color: #e2e8f0 !important;
+          box-shadow: 0 0 0 2px rgba(15, 157, 88, 0.15) !important;
+        }
+        .modal-close-hover:hover {
+          background-color: #f1f5f9 !important;
         }
         .invalid-password {
           border: 1px solid #ef4444 !important;
@@ -793,8 +885,9 @@ export default function Users() {
         .modal-cancel-btn:hover {
           background-color: #f8fafc !important;
         }
-        .modal-submit-btn:hover {
-          opacity: 0.9 !important;
+        .modal-submit-btn-user:hover {
+          opacity: 0.95 !important;
+          box-shadow: 0 4px 12px rgba(15, 157, 88, 0.2) !important;
         }
         .admin-add-btn-user:hover {
           background-color: #059669 !important;

@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../../services/api';
+import { setCookie } from '../../utils/cookies';
 import '../../styles/login.css';
 
 export default function Login() {
@@ -10,6 +11,14 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
 
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('reason') === 'expired') {
+      setError('Sesi Anda telah berakhir karena tidak ada aktivitas selama 15 menit. Silakan login kembali.');
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+  }, []);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
@@ -18,8 +27,8 @@ export default function Login() {
       const response = await api.post('/login', { email, password });
       if (response.data.status === 'success') {
         const { token, user } = response.data.data;
-        localStorage.setItem('token', token);
-        localStorage.setItem('role', user.role);
+        setCookie('token', token, 15);
+        setCookie('role', user.role, 15);
         
         if (user.role === 'admin') {
           navigate('/admin/dashboard');
