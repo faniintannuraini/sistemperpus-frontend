@@ -4,6 +4,11 @@ import Swal from 'sweetalert2';
 import api from '../../services/api';
 import '../../styles/student-book-detail.css';
 
+// Import cover images
+import pythonCover from '../../assets/images/python_book_cover.png';
+import mlCover from '../../assets/images/ml_book_cover.png';
+import cCover from '../../assets/images/c_book_cover.png';
+
 export default function BookDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -60,6 +65,17 @@ export default function BookDetail() {
     if (t.includes('sains') || t.includes('history') || t.includes('science') || t.includes('bumi')) return '🌌';
     if (t.includes('ekonomi') || t.includes('bisnis') || t.includes('akuntansi') || t.includes('uang')) return '📈';
     return '📖';
+  };
+
+  const getCoverImage = (title, id) => {
+    const t = (title || '').toLowerCase();
+    if (t.includes('machine') || t.includes('learning') || t.includes('ml')) return mlCover;
+    if (t.includes('expert c') || t.includes(' c ') || t.includes('programming c') || t.startsWith('c ')) return cCover;
+    
+    const idx = id ? parseInt(id, 10) : 0;
+    if (idx % 3 === 1) return mlCover;
+    if (idx % 3 === 2) return cCover;
+    return pythonCover;
   };
 
   const handleBorrowRequest = async () => {
@@ -145,7 +161,17 @@ export default function BookDetail() {
         {/* Left Column - Cover & Borrow Action Button */}
         <div className="detail-left-column">
           <div className="large-cover">
-            <span>{getBookEmoji(book.judul)}</span>
+            <img
+              src={getCoverImage(book.judul, book.id_buku)}
+              alt={book.judul}
+              style={{
+                width: '100%',
+                height: '100%',
+                objectFit: 'cover',
+                borderRadius: '15px',
+                display: 'block'
+              }}
+            />
           </div>
 
           <div className="borrow-action-wrapper">

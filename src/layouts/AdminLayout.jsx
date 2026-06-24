@@ -78,16 +78,24 @@ export default function AdminLayout() {
       {/* Sidebar Navigation */}
       <aside className={`admin-sidebar ${!sidebarOpen ? 'collapsed' : ''} ${sidebarOpen ? 'open' : ''}`}>
         <div className="admin-sidebar-brand">
-          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path
-              d="M12 21C12 21 8.5 17 3 17V5C8.5 5 12 9 12 9M12 21C12 21 15.5 17 21 17V5C15.5 5 12 9 12 9M12 21V9"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-          <h2 className="brand-text">SIPUS ADMIN</h2>
+          <div className="brand-logo-container">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect width="24" height="24" rx="6" fill="#2563eb" />
+              <g transform="translate(2.4, 2.4) scale(0.8)">
+                <path
+                  d="M12 21C12 21 8.5 17 3 17V5C8.5 5 12 9 12 9M12 21C12 21 15.5 17 21 17V5C15.5 5 12 9 12 9M12 21V9"
+                  stroke="#ffffff"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </g>
+            </svg>
+          </div>
+          <div className="brand-text-container">
+            <h2 className="brand-text brand-title">Perpustakaan</h2>
+            <span className="brand-text brand-subtitle">UNPER Tasikmalaya</span>
+          </div>
         </div>
 
         <ul className="admin-sidebar-menu">
@@ -214,14 +222,6 @@ export default function AdminLayout() {
           </div>
 
           <div className="admin-navbar-right">
-            {/* Notification Button */}
-            <button className="notification-btn" aria-label="Notifications">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-              </svg>
-              <span className="notification-badge"></span>
-            </button>
-
             {/* Admin Profile Display */}
             <div className="admin-profile-info">
               <div className="admin-details">

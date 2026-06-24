@@ -9,6 +9,7 @@ export default function Users() {
 
   // Modal States
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const [modalMode, setModalMode] = useState('add'); // 'add' | 'edit'
   const [formData, setFormData] = useState({
     id_user: '',
@@ -55,6 +56,7 @@ export default function Users() {
   // Action Handlers
   const handleAddUser = () => {
     setModalMode('add');
+    setShowPassword(false);
     setFormData({
       id_user: '',
       nama: '',
@@ -69,6 +71,7 @@ export default function Users() {
   const handleEdit = (user) => {
     const foundProdi = prodis.find(p => p.nama_prodi === user.nama_prodi);
     setModalMode('edit');
+    setShowPassword(false);
     setFormData({
       id_user: user.id_user,
       nama: user.nama,
@@ -129,14 +132,66 @@ export default function Users() {
       return;
     }
 
-    if (modalMode === 'add' && (!formData.password || formData.password.length < 6)) {
+    const nimPattern = /^\d+$/;
+    if (!nimPattern.test(formData.nim.trim())) {
       Swal.fire({
-        title: 'Formulir Belum Lengkap',
-        text: 'Password minimal 6 karakter wajib diisi untuk mahasiswa baru.',
+        title: 'NIM Tidak Valid',
+        text: 'NIM harus berupa angka saja.',
         icon: 'warning',
         confirmButtonColor: '#ea580c'
       });
       return;
+    }
+
+    if (modalMode === 'add') {
+      if (!formData.password) {
+        Swal.fire({
+          title: 'Formulir Belum Lengkap',
+          text: 'Password wajib diisi untuk mahasiswa baru.',
+          icon: 'warning',
+          confirmButtonColor: '#ea580c'
+        });
+        return;
+      }
+      if (formData.password.length < 6) {
+        Swal.fire({
+          title: 'Formulir Belum Lengkap',
+          text: 'Password minimal harus 6 karakter.',
+          icon: 'warning',
+          confirmButtonColor: '#ea580c'
+        });
+        return;
+      }
+      if (!(/^(?=.*[A-Za-z])(?=.*\d)/).test(formData.password)) {
+        Swal.fire({
+          title: 'Kombinasi Password Lemah',
+          text: 'Password harus berupa kombinasi huruf dan angka.',
+          icon: 'warning',
+          confirmButtonColor: '#ea580c'
+        });
+        return;
+      }
+    }
+
+    if (modalMode === 'edit' && formData.password) {
+      if (formData.password.length < 6) {
+        Swal.fire({
+          title: 'Formulir Belum Lengkap',
+          text: 'Password baru minimal harus 6 karakter.',
+          icon: 'warning',
+          confirmButtonColor: '#ea580c'
+        });
+        return;
+      }
+      if (!(/^(?=.*[A-Za-z])(?=.*\d)/).test(formData.password)) {
+        Swal.fire({
+          title: 'Kombinasi Password Lemah',
+          text: 'Password harus berupa kombinasi huruf dan angka.',
+          icon: 'warning',
+          confirmButtonColor: '#ea580c'
+        });
+        return;
+      }
     }
 
     const payload = {
@@ -193,6 +248,8 @@ export default function Users() {
     return selectedProdi === 'Semua Program Studi' || user.nama_prodi === selectedProdi;
   });
 
+  const isPasswordValInvalid = formData.password.length > 0 && (formData.password.length < 6 || !(/^(?=.*[A-Za-z])(?=.*\d)/).test(formData.password));
+
   return (
     <div style={{
       fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
@@ -240,12 +297,19 @@ export default function Users() {
             backgroundColor: '#ffffff',
             border: '1px solid #cbd5e1',
             borderRadius: '8px',
-            padding: '10px 16px',
+            padding: '10px 40px 10px 16px',
             fontSize: '14px',
             color: '#334155',
             outline: 'none',
             cursor: 'pointer',
-            minWidth: '200px'
+            minWidth: '200px',
+            appearance: 'none',
+            WebkitAppearance: 'none',
+            MozAppearance: 'none',
+            backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`,
+            backgroundRepeat: 'no-repeat',
+            backgroundPosition: 'right 16px center',
+            backgroundSize: '16px'
           }}
         >
           <option value="Semua Program Studi">Semua Program Studi</option>
@@ -524,6 +588,8 @@ export default function Users() {
                 <input
                   type="text"
                   required
+                  pattern="[0-9]*"
+                  inputMode="numeric"
                   placeholder="Contoh: 2201012"
                   value={formData.nim}
                   onChange={(e) => setFormData({ ...formData, nim: e.target.value })}
@@ -590,22 +656,52 @@ export default function Users() {
                 <label style={{ fontSize: '13px', fontWeight: 600, color: '#475569' }}>
                   Password {modalMode === 'edit' && '(Kosongkan jika tidak ingin mengubah)'}
                 </label>
-                <input
-                  type="password"
-                  required={modalMode === 'add'}
-                  placeholder={modalMode === 'add' ? "Minimal 6 karakter" : "Masukkan password baru"}
-                  value={formData.password}
-                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  style={{
-                    padding: '10px 14px',
-                    fontSize: '14px',
-                    borderRadius: '8px',
-                    border: '1px solid #cbd5e1',
-                    outline: 'none',
-                    transition: 'border-color 0.2s'
-                  }}
-                  className="modal-input"
-                />
+                <div style={{ position: 'relative', display: 'flex', alignItems: 'center', width: '100%' }}>
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    required={modalMode === 'add'}
+                    placeholder={modalMode === 'add' ? "Minimal 6 karakter & kombinasi" : "Masukkan password baru"}
+                    value={formData.password}
+                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                    style={{
+                      padding: '10px 40px 10px 14px',
+                      fontSize: '14px',
+                      borderRadius: '8px',
+                      border: '1px solid #cbd5e1',
+                      outline: 'none',
+                      transition: 'border-color 0.2s',
+                      width: '100%',
+                      boxSizing: 'border-box'
+                    }}
+                    className={`modal-input ${isPasswordValInvalid ? 'invalid-password' : ''}`}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    style={{
+                      position: 'absolute',
+                      right: '12px',
+                      background: 'none',
+                      border: 'none',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      color: '#64748b',
+                      padding: 0
+                    }}
+                  >
+                    {showPassword ? (
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} style={{ width: '18px', height: '18px' }}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.644 11.082 11.082 0 0117.828 0 1.012 1.012 0 010 .644 11.082 11.082 0 01-17.828 0z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                      </svg>
+                    ) : (
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} style={{ width: '18px', height: '18px' }}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88" />
+                      </svg>
+                    )}
+                  </button>
+                </div>
               </div>
 
               {/* Modal Footer Actions */}
@@ -686,6 +782,13 @@ export default function Users() {
         }
         .modal-input:focus {
           border-color: #3b82f6 !important;
+        }
+        .invalid-password {
+          border: 1px solid #ef4444 !important;
+        }
+        .invalid-password:focus {
+          border-color: #ef4444 !important;
+          box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2) !important;
         }
         .modal-cancel-btn:hover {
           background-color: #f8fafc !important;

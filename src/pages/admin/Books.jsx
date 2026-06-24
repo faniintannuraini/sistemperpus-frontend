@@ -154,12 +154,36 @@ export default function Books() {
       return;
     }
 
+    const currentYear = new Date().getFullYear();
+    const year = parseInt(formData.tahun_terbit, 10);
+    const stock = parseInt(formData.stok, 10);
+
+    if (isNaN(year) || year < 1000 || year > currentYear + 1) {
+      Swal.fire({
+        title: 'Tahun Terbit Tidak Valid',
+        text: `Tahun terbit harus antara 1000 dan ${currentYear + 1}.`,
+        icon: 'warning',
+        confirmButtonColor: '#ea580c'
+      });
+      return;
+    }
+
+    if (isNaN(stock) || stock < 0) {
+      Swal.fire({
+        title: 'Stok Tidak Valid',
+        text: 'Stok tersedia minimal bernilai 0.',
+        icon: 'warning',
+        confirmButtonColor: '#ea580c'
+      });
+      return;
+    }
+
     const payload = {
       judul: formData.judul,
       pengarang: formData.pengarang,
       penerbit: formData.penerbit,
-      tahun_terbit: parseInt(formData.tahun_terbit, 10),
-      stok: parseInt(formData.stok, 10),
+      tahun_terbit: year,
+      stok: stock,
       id_kategori: parseInt(formData.id_kategori, 10),
       rak: formData.rak
     };
@@ -254,12 +278,19 @@ export default function Books() {
             backgroundColor: '#ffffff',
             border: '1px solid #cbd5e1',
             borderRadius: '8px',
-            padding: '10px 16px',
+            padding: '10px 40px 10px 16px',
             fontSize: '14px',
             color: '#334155',
             outline: 'none',
             cursor: 'pointer',
-            minWidth: '200px'
+            minWidth: '200px',
+            appearance: 'none',
+            WebkitAppearance: 'none',
+            MozAppearance: 'none',
+            backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`,
+            backgroundRepeat: 'no-repeat',
+            backgroundPosition: 'right 16px center',
+            backgroundSize: '16px'
           }}
         >
           <option value="Semua Kategori">Semua Kategori</option>
@@ -319,19 +350,19 @@ export default function Books() {
                 borderBottom: '1px solid #e2e8f0',
                 backgroundColor: '#fafafb'
               }}>
-                <th style={{ padding: '16px 24px', color: '#64748b', fontSize: '14px', fontWeight: 600 }}>
+                <th style={{ padding: '16px 24px', color: '#64748b', fontSize: '13px', fontWeight: 600, whiteSpace: 'nowrap' }}>
                   Detail Buku
                 </th>
-                <th style={{ padding: '16px 24px', color: '#64748b', fontSize: '14px', fontWeight: 600 }}>
+                <th style={{ padding: '16px 24px', color: '#64748b', fontSize: '13px', fontWeight: 600, whiteSpace: 'nowrap' }}>
                   Kategori
                 </th>
-                <th style={{ padding: '16px 24px', color: '#64748b', fontSize: '14px', fontWeight: 600 }}>
+                <th style={{ padding: '16px 24px', color: '#64748b', fontSize: '13px', fontWeight: 600, whiteSpace: 'nowrap' }}>
                   Stok Tersedia
                 </th>
-                <th style={{ padding: '16px 24px', color: '#64748b', fontSize: '14px', fontWeight: 600 }}>
+                <th style={{ padding: '16px 24px', color: '#64748b', fontSize: '13px', fontWeight: 600, whiteSpace: 'nowrap' }}>
                   Lokasi Rak
                 </th>
-                <th style={{ padding: '16px 24px', color: '#64748b', fontSize: '14px', fontWeight: 600 }}>
+                <th style={{ padding: '16px 24px', color: '#64748b', fontSize: '13px', fontWeight: 600, whiteSpace: 'nowrap' }}>
                   Aksi
                 </th>
               </tr>
@@ -396,7 +427,8 @@ export default function Books() {
                       padding: '16px 24px',
                       fontSize: '14px',
                       fontWeight: 700,
-                      color: '#334155'
+                      color: '#334155',
+                      whiteSpace: 'nowrap'
                     }}>
                       {getCategoryName(book.id_kategori)}
                     </td>
@@ -406,11 +438,12 @@ export default function Books() {
                       <span style={{
                         backgroundColor: book.stok > 0 ? '#dcfce7' : '#fee2e2',
                         color: book.stok > 0 ? '#10b981' : '#ef4444',
-                        padding: '6px 14px',
-                        borderRadius: '12px',
-                        fontSize: '12px',
-                        fontWeight: 700,
-                        display: 'inline-block'
+                        padding: '4px 10px',
+                        borderRadius: '8px',
+                        fontSize: '11px',
+                        fontWeight: 600,
+                        display: 'inline-block',
+                        whiteSpace: 'nowrap'
                       }}>
                         {book.stok} Exemplar
                       </span>
@@ -628,6 +661,8 @@ export default function Books() {
                 <input
                   type="number"
                   required
+                  min="1000"
+                  max={new Date().getFullYear() + 1}
                   placeholder="Contoh: 2023"
                   value={formData.tahun_terbit}
                   onChange={(e) => setFormData({ ...formData, tahun_terbit: e.target.value })}
@@ -674,6 +709,7 @@ export default function Books() {
                 <input
                   type="number"
                   required
+                  min="0"
                   placeholder="Contoh: 15"
                   value={formData.stok}
                   onChange={(e) => setFormData({ ...formData, stok: e.target.value })}
