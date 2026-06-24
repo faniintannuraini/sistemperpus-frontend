@@ -57,19 +57,39 @@ body:has(.admin-layout-container) #root {
   overflow: hidden;
 }
 
-.admin-sidebar-brand svg {
-  color: var(--admin-primary);
-  width: 28px;
-  height: 28px;
+.brand-logo-container {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   flex-shrink: 0;
 }
 
-.admin-sidebar-brand h2 {
-  font-size: 18px;
+.brand-logo-container svg {
+  width: 100%;
+  height: 100%;
+}
+
+.brand-text-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.brand-title {
+  font-size: 16px;
   font-weight: 700;
   margin: 0;
   color: var(--text-h);
-  white-space: nowrap;
+  line-height: 1.2;
+}
+
+.brand-subtitle {
+  font-size: 11px;
+  color: #64748b;
+  font-weight: 500;
+  line-height: 1.2;
 }
 
 .admin-sidebar-menu {

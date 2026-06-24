@@ -29,39 +29,39 @@ export default function Dashboard() {
   const stats = [
     {
       title: 'Total Buku',
-      count: `${statsData.total_buku} Buku`,
+      count: statsData.total_buku,
       icon: (
-        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ width: '24px', height: '24px' }}>
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ width: '20px', height: '20px' }}>
           <path d="M19 3H5C3.9 3 3 3.9 3 5V19C3 20.1 3.9 21 5 21H19C20.1 21 21 20.1 21 19V5C21 3.9 20.1 3 19 3ZM16 17H8V15H16V17ZM16 13H8V11H16V13ZM16 9H8V7H16V9Z" fill="#2563eb"/>
         </svg>
       ),
       bg: '#eff6ff'
     },
     {
-      title: 'Total User (Mahasiswa)',
-      count: `${statsData.total_mahasiswa} Mahasiswa`,
+      title: 'Total Mahasiswa',
+      count: statsData.total_mahasiswa,
       icon: (
-        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ width: '24px', height: '24px' }}>
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ width: '20px', height: '20px' }}>
           <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5s-3 1.34-3 3 1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5 5 6.34 5 8s1.34 3 3 3zm0 2.02c-2.33 0-7 1.17-7 3.5V19h14v-2.48c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.43V19h6v-2.48c0-2.33-4.67-3.5-7-3.5z" fill="#10b981"/>
         </svg>
       ),
       bg: '#dcfce7'
     },
     {
-      title: 'Buku Sedang Dipinjam',
-      count: `${statsData.buku_sedang_dipinjam} Buku`,
+      title: 'Buku Dipinjam',
+      count: statsData.buku_sedang_dipinjam,
       icon: (
-        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ width: '24px', height: '24px' }}>
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ width: '20px', height: '20px' }}>
           <path d="M5 4v2h14V4H5zm0 10h4v6H5v-6zm10 0h4v6h-4v-6zm-5-5h4v11h-4V9z" fill="#a855f7"/>
         </svg>
       ),
       bg: '#f3e8ff'
     },
     {
-      title: 'Denda Belum Dibayar',
-      count: `${statsData.user_belum_bayar_denda} User`,
+      title: 'Denda Pending',
+      count: statsData.user_belum_bayar_denda,
       icon: (
-        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ width: '24px', height: '24px' }}>
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ width: '20px', height: '20px' }}>
           <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM13 17H11V15H13V17ZM13 13H11V7H13V13Z" fill="#ef4444"/>
         </svg>
       ),
@@ -107,24 +107,24 @@ export default function Dashboard() {
         gap: '20px',
         marginTop: '8px'
       }} className="admin-stats-grid">
-        {stats.map((stat, index) => (
+         {stats.map((stat, index) => (
           <div
             key={index}
             style={{
               backgroundColor: '#ffffff',
               border: '1px solid #e2e8f0',
               borderRadius: '12px',
-              padding: '16px 20px',
-              height: '80px',
+              padding: '12px 16px',
+              minHeight: '72px',
               display: 'flex',
               alignItems: 'center',
-              gap: '16px',
+              gap: '12px',
               boxSizing: 'border-box'
             }}
           >
             <div style={{
-              width: '48px',
-              height: '48px',
+              width: '40px',
+              height: '40px',
               borderRadius: '8px',
               display: 'flex',
               alignItems: 'center',
@@ -134,19 +134,19 @@ export default function Dashboard() {
             }} className="stat-icon-wrapper">
               {stat.icon}
             </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1px' }}>
               <span style={{
-                fontSize: '11px',
-                fontWeight: 500,
+                fontSize: '10px',
+                fontWeight: 600,
                 color: '#64748b',
                 textTransform: 'uppercase',
                 letterSpacing: '0.5px'
               }}>{stat.title}</span>
               <span style={{
-                fontSize: '20px',
+                fontSize: '18px',
                 fontWeight: 700,
                 color: '#0f172a',
-                lineHeight: 1
+                lineHeight: 1.1
               }}>{stat.count}</span>
             </div>
           </div>
