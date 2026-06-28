@@ -46,7 +46,11 @@ export default function History() {
     return returned > due ? 'Terlambat' : 'Tepat Waktu';
   };
 
-  const getCoverImage = (title, id) => {
+  const getCoverImage = (title, id, gambar) => {
+    if (gambar) {
+      if (gambar.startsWith('http')) return gambar;
+      return `${import.meta.env.VITE_API_URL}/${gambar}`;
+    }
     const t = (title || '').toLowerCase();
     if (t.includes('machine') || t.includes('learning') || t.includes('ml')) return mlCover;
     if (t.includes('expert c') || t.includes(' c ') || t.includes('programming c') || t.startsWith('c ')) return cCover;
@@ -203,7 +207,7 @@ export default function History() {
                 <div className="card-left-section">
                   <div className="book-cover-wrapper">
                     <img 
-                      src={getCoverImage(item.book?.judul, item.id_buku)} 
+                      src={getCoverImage(item.book?.judul, item.id_buku, item.book?.gambar)} 
                       alt={item.book?.judul || 'Cover'} 
                       className="book-cover-img" 
                     />

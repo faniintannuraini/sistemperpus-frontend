@@ -23,7 +23,10 @@ export default function Books() {
     tahun_terbit: '',
     stok: '',
     id_kategori: '',
-    rak: 'RAK-IT 101'
+    rak: 'RAK-IT 101',
+    coverFile: null,
+    coverFileName: '',
+    gambar: ''
   });
 
   useEffect(() => {
@@ -59,7 +62,11 @@ export default function Books() {
     }
   };
 
-  const getCoverImage = (title, id) => {
+  const getCoverImage = (title, id, gambar) => {
+    if (gambar) {
+      if (gambar.startsWith('http')) return gambar;
+      return `${import.meta.env.VITE_API_URL}/${gambar}`;
+    }
     const t = (title || '').toLowerCase();
     if (t.includes('machine') || t.includes('learning') || t.includes('ml')) return mlCover;
     if (t.includes('expert c') || t.includes(' c ') || t.includes('programming c') || t.startsWith('c ')) return cCover;
@@ -85,7 +92,10 @@ export default function Books() {
       tahun_terbit: new Date().getFullYear().toString(),
       stok: '10',
       id_kategori: categories[0]?.id_kategori || '',
-      rak: 'RAK-IT 101'
+      rak: 'RAK-IT 101',
+      coverFile: null,
+      coverFileName: '',
+      gambar: ''
     });
     setIsModalOpen(true);
   };
@@ -100,7 +110,10 @@ export default function Books() {
       tahun_terbit: book.tahun_terbit ? book.tahun_terbit.toString() : '',
       stok: book.stok ? book.stok.toString() : '',
       id_kategori: book.id_kategori || '',
-      rak: book.rak || 'RAK-IT 101'
+      rak: book.rak || 'RAK-IT 101',
+      coverFile: null,
+      coverFileName: book.gambar ? book.gambar.split('/').pop() : '',
+      gambar: book.gambar || ''
     });
     setIsModalOpen(true);
   };
@@ -178,19 +191,23 @@ export default function Books() {
       return;
     }
 
-    const payload = {
-      judul: formData.judul,
-      pengarang: formData.pengarang,
-      penerbit: formData.penerbit,
-      tahun_terbit: year,
-      stok: stock,
-      id_kategori: parseInt(formData.id_kategori, 10),
-      rak: formData.rak
-    };
+    const payload = new FormData();
+    payload.append('judul', formData.judul);
+    payload.append('pengarang', formData.pengarang);
+    payload.append('penerbit', formData.penerbit);
+    payload.append('tahun_terbit', year);
+    payload.append('stok', stock);
+    payload.append('id_kategori', parseInt(formData.id_kategori, 10));
+    payload.append('rak', formData.rak);
+    if (formData.coverFile) {
+      payload.append('gambar', formData.coverFile);
+    }
 
     try {
       if (modalMode === 'add') {
-        const response = await api.post('/buku', payload);
+        const response = await api.post('/buku', payload, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        });
         if (response.data && response.data.status === 'success') {
           Swal.fire({
             title: 'Berhasil!',
@@ -202,7 +219,9 @@ export default function Books() {
           setIsModalOpen(false);
         }
       } else {
-        const response = await api.put(`/buku/${formData.id_buku}`, payload);
+        const response = await api.post(`/buku/${formData.id_buku}?_method=PUT`, payload, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        });
         if (response.data && response.data.status === 'success') {
           Swal.fire({
             title: 'Berhasil!',
@@ -395,7 +414,7 @@ export default function Books() {
                           backgroundColor: '#f8fafc'
                         }}>
                           <img
-                            src={getCoverImage(book.judul, book.id_buku)}
+                            src={getCoverImage(book.judul, book.id_buku, book.gambar)}
                             alt={book.judul}
                             style={{
                               width: '100%',
@@ -938,7 +957,11 @@ export default function Books() {
                       style={{ display: 'none' }}
                       onChange={(e) => {
                         if (e.target.files && e.target.files[0]) {
-                          setFormData({ ...formData, coverFileName: e.target.files[0].name });
+                          setFormData({ 
+                            ...formData, 
+                            coverFile: e.target.files[0],
+                            coverFileName: e.target.files[0].name 
+                          });
                           Swal.fire({
                             title: 'File Terpilih',
                             text: e.target.files[0].name,
