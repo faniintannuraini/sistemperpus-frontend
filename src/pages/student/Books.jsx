@@ -50,7 +50,11 @@ export default function Books() {
     }
   };
 
-  const getCoverImage = (title, id) => {
+  const getCoverImage = (title, id, gambar) => {
+    if (gambar) {
+      if (gambar.startsWith('http')) return gambar;
+      return `${import.meta.env.VITE_API_URL}/${gambar}`;
+    }
     const t = (title || '').toLowerCase();
     if (t.includes('machine') || t.includes('learning') || t.includes('ml')) return mlCover;
     if (t.includes('expert c') || t.includes(' c ') || t.includes('programming c') || t.startsWith('c ')) return cCover;
@@ -126,7 +130,7 @@ export default function Books() {
             >
               {/* Cover Container */}
               <div className="cover-container">
-                <img src={getCoverImage(book.judul, book.id_buku)} alt={book.judul} className="cover-img" />
+                <img src={getCoverImage(book.judul, book.id_buku, book.gambar)} alt={book.judul} className="cover-img" />
               </div>
 
               {/* Book Details */}

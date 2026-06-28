@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import Swal from 'sweetalert2';
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import api from '../services/api';
+import { eraseCookie } from '../utils/cookies';
+import { useIdleTimeout } from '../hooks/useIdleTimeout';
 import '../styles/admin-layout.css';
 
 export default function AdminLayout() {
@@ -9,6 +11,8 @@ export default function AdminLayout() {
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const [profile, setProfile] = useState({ nama: 'Administrator', role: 'admin' });
   const navigate = useNavigate();
+
+  useIdleTimeout(15);
 
   useEffect(() => {
     fetchProfile();
@@ -55,8 +59,8 @@ export default function AdminLayout() {
         } catch (err) {
           console.error('Logout error:', err);
         }
-        localStorage.removeItem('token');
-        localStorage.removeItem('role');
+        eraseCookie('token');
+        eraseCookie('role');
         navigate('/login');
       }
     });

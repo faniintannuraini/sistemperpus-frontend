@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import Swal from 'sweetalert2';
 import { Outlet, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import api from '../services/api';
+import { eraseCookie } from '../utils/cookies';
+import { useIdleTimeout } from '../hooks/useIdleTimeout';
 import '../styles/student-layout.css';
 
 export default function StudentLayout() {
@@ -10,6 +12,8 @@ export default function StudentLayout() {
   const [profile, setProfile] = useState({ nama: 'Fani', nama_prodi: 'Teknik Informatika' });
   const location = useLocation();
   const navigate = useNavigate();
+
+  useIdleTimeout(15);
 
   useEffect(() => {
     fetchProfile();
@@ -54,8 +58,8 @@ export default function StudentLayout() {
         } catch (err) {
           console.error('Logout error:', err);
         }
-        localStorage.removeItem('token');
-        localStorage.removeItem('role');
+        eraseCookie('token');
+        eraseCookie('role');
         navigate('/login');
       }
     });

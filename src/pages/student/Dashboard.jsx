@@ -33,7 +33,11 @@ export default function StudentDashboard() {
     }
   };
 
-  const getCoverImage = (title, id) => {
+  const getCoverImage = (title, id, gambar) => {
+    if (gambar) {
+      if (gambar.startsWith('http')) return gambar;
+      return `${import.meta.env.VITE_API_URL}/${gambar}`;
+    }
     const t = (title || '').toLowerCase();
     if (t.includes('machine') || t.includes('learning') || t.includes('ml')) return mlCover;
     if (t.includes('expert c') || t.includes(' c ') || t.includes('programming c') || t.startsWith('c ')) return cCover;
@@ -91,7 +95,7 @@ export default function StudentDashboard() {
               dashboardData.buku_baru.map((book) => (
                 <div key={book.id_buku} className="book-card-item" onClick={() => navigate(`/student/book/${book.id_buku}`)} style={{ cursor: 'pointer' }}>
                   <div className="book-card-cover-wrapper">
-                    <img src={getCoverImage(book.judul, book.id_buku)} alt={book.judul} className="book-card-cover-img" />
+                    <img src={getCoverImage(book.judul, book.id_buku, book.gambar)} alt={book.judul} className="book-card-cover-img" />
                   </div>
                   <div className="book-card-details">
                     <h3 className="book-card-title">{book.judul}</h3>
@@ -117,7 +121,7 @@ export default function StudentDashboard() {
               dashboardData.sering_dipinjam.map((book) => (
                 <div key={`fav-${book.id_buku}`} className="book-card-item" onClick={() => navigate(`/student/book/${book.id_buku}`)} style={{ cursor: 'pointer' }}>
                   <div className="book-card-cover-wrapper">
-                    <img src={getCoverImage(book.judul, book.id_buku)} alt={book.judul} className="book-card-cover-img" />
+                    <img src={getCoverImage(book.judul, book.id_buku, book.gambar)} alt={book.judul} className="book-card-cover-img" />
                   </div>
                   <div className="book-card-details">
                     <h3 className="book-card-title">{book.judul}</h3>
