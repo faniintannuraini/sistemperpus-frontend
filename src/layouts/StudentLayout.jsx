@@ -10,6 +10,9 @@ export default function StudentLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(window.innerWidth > 768); // Default open on desktop
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const [profile, setProfile] = useState({ nama: 'Fani', nama_prodi: 'Teknik Informatika' });
+  const [notifications, setNotifications] = useState([]);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const [notifDropdownOpen, setNotifDropdownOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -17,6 +20,9 @@ export default function StudentLayout() {
 
   useEffect(() => {
     fetchProfile();
+    fetchNotifications();
+    const interval = setInterval(fetchNotifications, 30000);
+
     const handleResize = () => {
       const mobile = window.innerWidth <= 768;
       setIsMobile(mobile);
@@ -27,8 +33,70 @@ export default function StudentLayout() {
       }
     };
     window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+
+    const handleOutsideClick = (e) => {
+      if (!e.target.closest('.notif-wrapper')) {
+        setNotifDropdownOpen(false);
+      }
+    };
+    document.addEventListener('click', handleOutsideClick);
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      document.removeEventListener('click', handleOutsideClick);
+      clearInterval(interval);
+    };
   }, []);
+
+  const fetchNotifications = async () => {
+    try {
+      const response = await api.get('/notifications');
+      if (response.data && response.data.status === 'success') {
+        const notifs = response.data.data;
+        setNotifications(notifs);
+        setUnreadCount(notifs.filter(n => !n.is_read).length);
+      }
+    } catch (error) {
+      console.error('Error fetching student notifications:', error);
+    }
+  };
+
+  const handleMarkAsRead = async (id) => {
+    try {
+      await api.patch(`/notifications/${id}/read`);
+      fetchNotifications();
+    } catch (error) {
+      console.error('Error marking notification as read:', error);
+    }
+  };
+
+  const handleMarkAllAsRead = async () => {
+    try {
+      await api.patch('/notifications/read-all');
+      fetchNotifications();
+    } catch (error) {
+      console.error('Error marking all notifications as read:', error);
+    }
+  };
+
+  const handleDelete = async (e, id) => {
+    e.stopPropagation();
+    try {
+      await api.delete(`/notifications/${id}`);
+      fetchNotifications();
+    } catch (error) {
+      console.error('Error deleting notification:', error);
+    }
+  };
+
+  const handleDeleteAll = async () => {
+    try {
+      await api.delete('/notifications');
+      fetchNotifications();
+    } catch (error) {
+      console.error('Error deleting all notifications:', error);
+    }
+  };
 
   const fetchProfile = async () => {
     try {
@@ -185,6 +253,76 @@ export default function StudentLayout() {
           </div>
 
           <div className="student-navbar-right">
+            {/* Notification Bell & Dropdown */}
+            <div className="notif-wrapper">
+              <button 
+                className={`notif-bell-btn ${unreadCount > 0 ? 'has-unread' : ''}`} 
+                onClick={() => setNotifDropdownOpen(!notifDropdownOpen)}
+                aria-label="Notifikasi"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} className="bell-icon">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                </svg>
+                {unreadCount > 0 && <span className="notif-badge">{unreadCount}</span>}
+              </button>
+
+              {notifDropdownOpen && (
+                <div className="notif-dropdown">
+                  <div className="notif-dropdown-header">
+                    <h3 className="notif-dropdown-title">Notifikasi</h3>
+                    <div className="notif-actions">
+                      {unreadCount > 0 && (
+                        <button className="mark-all-read-btn" onClick={handleMarkAllAsRead}>
+                          Tandai Dibaca
+                        </button>
+                      )}
+                      {notifications.length > 0 && (
+                        <button className="delete-all-btn" onClick={handleDeleteAll}>
+                          Hapus Semua
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                  <div className="notif-dropdown-body">
+                    {notifications.length === 0 ? (
+                      <div className="notif-empty-state">
+                        <span className="notif-empty-icon">🔔</span>
+                        <p>Tidak ada notifikasi baru</p>
+                      </div>
+                    ) : (
+                      notifications.map((notif) => (
+                        <div 
+                          key={notif.id_notification} 
+                          className={`notif-item ${notif.is_read ? 'read' : 'unread'} notif-type-${notif.type}`}
+                          onClick={() => !notif.is_read && handleMarkAsRead(notif.id_notification)}
+                        >
+                          <div className="notif-item-header">
+                            <span className="notif-item-title">
+                              {notif.type === 'approval' && '✅ '}
+                              {notif.type === 'rejection' && '❌ '}
+                              {notif.type === 'fine' && '💸 '}
+                              {notif.type === 'due_warning' && '⚠️ '}
+                              {notif.title}
+                            </span>
+                            <div className="notif-item-right-header">
+                              <span className="notif-item-time">
+                                {new Date(notif.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}
+                              </span>
+                              <button className="delete-notif-btn" onClick={(e) => handleDelete(e, notif.id_notification)} title="Hapus Notifikasi">
+                                &times;
+                              </button>
+                            </div>
+                          </div>
+                          <p className="notif-item-message">{notif.message}</p>
+                          {!notif.is_read && <span className="unread-dot"></span>}
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+
             <div className="user-profile-info">
               <div className="user-details">
                 <span className="user-name">{profile.nama || 'Mahasiswa'}</span>
